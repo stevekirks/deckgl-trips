@@ -11,7 +11,7 @@ export interface AppState {
   friendlyTime: string,
   trailLength: number,
   percentThroughLoop: number,
-  dataUrlIdx: number,
+  dataSampleIdx: number,
   stopList: string[],
   highlightedStops: string[],
   stops: geojson.FeatureCollection<geojson.Point> | null,
@@ -38,26 +38,27 @@ export interface AppState {
  export interface AppConfig {
     name: string,
     defaultTitle: string,
-    dataUrls: LabelValue[],
+    dataSamples: DataSampleUrls[],
     mapboxStyle: string,
     color: number[],
     colors: number[][],
     highlightColor: number[],
     defaultLoopTimeMinutes: number,
     defaultTrailLength: number,
-    geoJsonUrl: string,
-    stopListUrl: string,
     mapboxToken: string,
     getInitialViewport: () => Viewport
 };
 
-export interface LabelValue {
-    label: string,
-    value: string
+export interface DataSampleUrls {
+    title: string,
+    tripsUrl: string,
+    geoJsonUrl: string,
+    stopListUrl: string,
+    getInitialPartialViewport: () => PartialViewport
 }
 
 export interface KnownUrlParameters {
-    dataUrlIdx: number | null,
+    dataSampleIdx: number | null,
     loopTime: number | null,
     trailLength: number | null,
     highlightedStops: string[] | null
@@ -79,10 +80,16 @@ export interface Trip {
     segments: Waypoint[]
 }
 
+export interface PartialViewport {
+    latitude: number,
+    longitude: number,
+    zoom: number
+}
+
 export interface Viewport {
     latitude: number,
     longitude: number,
-    zoom: number,
+    zoom: number
     maxZoom: number,
     pitch: number,
     bearing: number,
