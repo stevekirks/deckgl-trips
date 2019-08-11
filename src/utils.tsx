@@ -43,7 +43,7 @@ function updateKeyInString(keysString: string, sParam: string, sValue: string): 
 export default {
   getKnownUrlParameters(): KnownUrlParameters {
     let result: KnownUrlParameters = {
-      dataUrlIdx: null,
+      dataSampleIdx: null,
       loopTime: null,
       trailLength: null,
       highlightedStops: null
@@ -52,7 +52,7 @@ export default {
     // Convert day to dataUrlIdx
     let dataIdx = getNumber(getUrlParam(PARAM_DATA_IDX));
     if (dataIdx != null && dataIdx >= 0) {
-      result.dataUrlIdx = dataIdx;
+      result.dataSampleIdx = dataIdx;
     }
 
     // Validate loopTime
@@ -78,8 +78,8 @@ export default {
 
   updateUrlParameters(params: KnownUrlParameters) {
     let newStateStr = decodeURIComponent(window.location.search.substring(1));
-    if (params.dataUrlIdx != null) {
-      newStateStr = updateKeyInString(newStateStr, PARAM_DATA_IDX, String(params.dataUrlIdx));
+    if (params.dataSampleIdx != null) {
+      newStateStr = updateKeyInString(newStateStr, PARAM_DATA_IDX, String(params.dataSampleIdx));
     }
     if (params.loopTime != null) {
       newStateStr = updateKeyInString(newStateStr, PARAM_LOOPTIME, String(params.loopTime));
