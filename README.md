@@ -16,8 +16,8 @@ Sample data is of South-East Queensland Bus & Ferry service locations from the [
 -   highlight trips that stop at a bus stop
 -   hover over bus stops to get their Id
 
-## Usage
-Clone this repo, set environment variables `REACT_APP_MAPBOX_TOKEN` and `REACT_APP_MAPBOX_STYLE` with a [Mapbox](https://www.mapbox.com/) token and style (can be set in the file `.env.development`). Then:
+### Usage
+Clone this repo, set environment variable `REACT_APP_MAPBOX_TOKEN` with a [Mapbox](https://www.mapbox.com/) token, and optionally `REACT_APP_MAPBOX_STYLE` with a mapbox style. These variables can be set in the `.env.development` file. Then:
 ```
 npm install
 npm start
