@@ -4,9 +4,9 @@
   </a>
 </p>
 
-<h1 align="center">deck.gl trips | <a href="https://stevekirks.github.io/deckgl-trips">demo website</a></h1>
+<h1 align="center">deck.gl trips | <a href="https://stevekirks.github.io/deckgl-trips">demo</a></h1>
 
-This is an implementation of the deck.gl trips layer. Built using [deck.gl](https://uber.github.io/deck.gl) with [Create-React-App](https://facebook.github.io/create-react-app/) [Typescript](https://facebook.github.io/create-react-app/docs/adding-typescript).
+This is an example of the deck.gl trips layer. Built using [deck.gl](https://uber.github.io/deck.gl) with [Create-React-App](https://facebook.github.io/create-react-app/) [Typescript](https://facebook.github.io/create-react-app/docs/adding-typescript).
 
 Sample data is of South-East Queensland Bus & Ferry service locations from the [Translink real-time data feed](https://data.qld.gov.au/dataset/translink-real-time-data), transformed to suit.
 
@@ -24,4 +24,4 @@ npm start
 ```
 
 ### Data format
-Sample data is stored in the `public/data` folder. Not all bus stops are shown, only a handful of the most popular ones.
+Sample data is stored in the `public/data` folder. Not all service stops are shown, only a handful of the most popular ones.
