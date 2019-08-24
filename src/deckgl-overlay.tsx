@@ -6,7 +6,6 @@ import { CURRENT_APP_CONFIG } from './app-config';
 export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, DeckflOverlayState> {
 
   _animationFrame: number | null;
-  intervalId: any;
 
   constructor(props: any) {
     super(props);
@@ -22,14 +21,12 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
 
   componentDidMount() {
     this._animate();
-    this.intervalId = setInterval(() => this.props.periodicTripUpdateCallback(), 500);
   }
 
   componentWillUnmount() {
     if (this._animationFrame != null) {
       window.cancelAnimationFrame(this._animationFrame);
     }
-     clearInterval(this.intervalId);
   }
   
   getColor(d: Trip) {

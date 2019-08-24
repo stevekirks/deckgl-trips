@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import ReactMapGL, {Popup} from 'react-map-gl';
 import {json as requestJson} from 'd3-request';
 import DeckGLOverlay from './deckgl-overlay';
@@ -19,6 +18,7 @@ export default class App extends React.Component<AppProps, AppState> {
   timestampOffset: number;
   knownUrlParams: KnownUrlParameters;
   highlighedStopsChangedBeforeReload: boolean;
+  intervalId: any;
 
   constructor(props: any) {
     super(props);
@@ -66,9 +66,11 @@ export default class App extends React.Component<AppProps, AppState> {
     this.loadTrips(this.state.dataSampleIdx);
     this.loadStopList(this.state.dataSampleIdx);
     this.loadGeoJsonStops(this.state.dataSampleIdx);
+    this.intervalId = setInterval(() => this.updateBoxInfo(), 1000);
   }
 
   componentWillUnmount() {
+    clearInterval(this.intervalId);
   }
 
   loadTrips(dataUrlIdx: number) {
@@ -321,7 +323,6 @@ export default class App extends React.Component<AppProps, AppState> {
               highlightedStops={highlightedStops}
               loopLength={loopLength}
               loopTimeMilliseconds={this.getLoopTime()}
-              periodicTripUpdateCallback={this.updateBoxInfo}
               stops={stops!}
               timestampOffset={this.timestampOffset}
               trips={trips}
@@ -372,5 +373,3 @@ export default class App extends React.Component<AppProps, AppState> {
     );
   }
 }
-
-ReactDOM.render(<App />, document.body.appendChild(document.createElement('div')));
