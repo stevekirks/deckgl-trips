@@ -24,7 +24,6 @@ export interface AppState {
     highlightedStops: string[],
     loopLength: number,
     loopTimeMilliseconds: number,
-    periodicTripUpdateCallback: () => void,
     stops: geojson.FeatureCollection<geojson.Point>,
     timestampOffset: number,
     trips: Trip[] | null,
