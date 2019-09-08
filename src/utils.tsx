@@ -19,7 +19,7 @@ function getNumber(numStr: string): number | null {
 const PARAM_DATA_IDX = 'dataIdx';
 const PARAM_LOOPTIME = 'loopTime';
 const PARAM_TRAILLENGTH = 'trailLength';
-const PARAM_HIGHLIGHTSTOPS = 'highlightStops';
+const PARAM_HIGHLIGHTNODES = 'highlightNodes';
 
 function updateKeyInString(keysString: string, sParam: string, sValue: string): string {
   let sURLVariables = keysString.length > 0 ? keysString.split('&') : [];
@@ -46,7 +46,7 @@ export default {
       dataSampleIdx: null,
       loopTime: null,
       trailLength: null,
-      highlightedStops: null
+      highlightedNodes: null
     };
 
     // Convert day to dataUrlIdx
@@ -67,10 +67,10 @@ export default {
       result.trailLength = trailLength;
     }
 
-    // Validate highlightStop
-    let highlightStops = getUrlParam(PARAM_HIGHLIGHTSTOPS);
-    if (highlightStops != null && highlightStops.length > 0) {
-      result.highlightedStops = highlightStops.split(',');
+    // Validate highlightNode
+    let highlightNodes = getUrlParam(PARAM_HIGHLIGHTNODES);
+    if (highlightNodes != null && highlightNodes.length > 0) {
+      result.highlightedNodes = highlightNodes.split(',');
     }
 
     return result;
@@ -87,8 +87,8 @@ export default {
     if (params.trailLength != null) {
       newStateStr = updateKeyInString(newStateStr, PARAM_TRAILLENGTH, String(params.trailLength));
     }
-    if (params.highlightedStops != null) {
-      newStateStr = updateKeyInString(newStateStr, PARAM_HIGHLIGHTSTOPS, params.highlightedStops.join(','));
+    if (params.highlightedNodes != null) {
+      newStateStr = updateKeyInString(newStateStr, PARAM_HIGHLIGHTNODES, params.highlightedNodes.join(','));
     }
     
     let queryFilters = "?" + newStateStr;
