@@ -76,7 +76,7 @@ export interface Trip {
     nodes: string[],
     startTime: number,
     endTime: number,
-    color?: any,
+    color?: number[],
     segments: Waypoint[]
 }
 
