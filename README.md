@@ -25,4 +25,4 @@ npm start
 
 ### Data format
 Sample data is stored in the `public/data` folder. Not all bus/ferry stops are shown, only a handful of the most popular ones.
-If you wish to use different data, the `app-config.ts` file contains labels and URLs that you can update.
+If you wish to use different data, the `default-app-config.ts` file contains default labels and URLs that you can update.

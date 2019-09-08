@@ -1,7 +1,6 @@
 import * as React from 'react';
 import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl';
-import {DeckglOverlayProps, Trip, DeckflOverlayState} from './data-interfaces';
-import { CURRENT_APP_CONFIG } from './app-config';
+import {DeckglOverlayProps, Trip, DeckflOverlayState, Waypoint} from './data-interfaces';
 
 export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, DeckflOverlayState> {
 
@@ -34,9 +33,6 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
     if (this.props.loopLength != null) {
       const timestamp = Date.now() - this.props.timestampOffset;
       const loopTime = this.props.loopTimeMilliseconds; // the loop time in milliseconds that deck gl displays
-
-      // 432000 == 5 days
-
       this.setState({
         currentTime: (timestamp % loopTime) * (this.props.loopLength / loopTime)
       });
@@ -45,8 +41,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
   }
   
   getColor(d: Trip) {
-    let color = CURRENT_APP_CONFIG.color;
-
+    let color = this.props.color;
     const tagColor = d.color;
     if (tagColor != null) {
       color = tagColor;
@@ -57,7 +52,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
         let self = this;
         d.nodes.forEach((n: string) => {
           if (self.props.highlightedNodes.find((hn: string) => n.toLowerCase() === hn.toLowerCase()) != null) {
-            color = CURRENT_APP_CONFIG.highlightColor;
+            color = this.props.highlightColor;
           }
         });
       }
@@ -67,7 +62,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
   }
 
   render() {
-    const {trips, trailLength, nodes, handleOnHover, viewport} = this.props;
+    const {handleOnHover, initialViewState, nodes, trips, trailLength, viewport} = this.props;
     const {currentTime} = this.state;
 
     let layers = [];
@@ -76,8 +71,8 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
       layers.push(new TripsLayer({
         id: 'trips',
         data: trips,
-        getPath: (d: any) => d.segments.map((p: any) => p.coordinates),
-        getTimestamps: (d: any) => d.segments.map((p: any) => p.timestamp),
+        getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates),
+        getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
         getColor: this.getColor,
         opacity: 0.3,
         widthMinPixels: 2,
@@ -91,11 +86,11 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
         id: 'geojson-layer',
         data: nodes,
         filled: true,
-        getFillColor: (d: any) => [0, 255, 178, 150],
+        getFillColor: () => [0, 255, 178, 150],
         stroked: true,
         extruded: false,
         pointRadiusScale: 100,
-        getRadius: (d: any) => 0.4,
+        getRadius: () => 0.4,
         pickable: true,
         autoHighlight: true,
         highlightColor: [0, 255, 178, 250],
@@ -110,7 +105,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
 
     return (
       <DeckGL
-        initialViewState={CURRENT_APP_CONFIG.getInitialViewport()}
+        initialViewState={initialViewState}
         viewState={viewport}
         layers={layers}
       />
