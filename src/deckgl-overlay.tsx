@@ -37,11 +37,11 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
       color = tagColor;
     }
 
-    if (CURRENT_APP_CONFIG.highlightColor != null && d.stops != null) {
-      if (this.props.highlightedStops.length > 0) {
+    if (CURRENT_APP_CONFIG.highlightColor != null && d.nodes != null) {
+      if (this.props.highlightedNodes.length > 0) {
         let self = this;
-        d.stops.forEach((n: string) => {
-          if (self.props.highlightedStops.find((hn: string) => n.toLowerCase() === hn.toLowerCase()) != null) {
+        d.nodes.forEach((n: string) => {
+          if (self.props.highlightedNodes.find((hn: string) => n.toLowerCase() === hn.toLowerCase()) != null) {
             color = CURRENT_APP_CONFIG.highlightColor;
           }
         });
@@ -66,7 +66,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
   }
 
   render() {
-    const {trips, trailLength, stops, handleOnHover, viewport} = this.props;
+    const {trips, trailLength, nodes, handleOnHover, viewport} = this.props;
     const {currentTime} = this.state;
 
     let layers = [];
@@ -85,10 +85,10 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
       }));
     }
 
-    if (stops != null) {
+    if (nodes != null) {
       layers.push(new GeoJsonLayer({
         id: 'geojson-layer',
-        data: stops,
+        data: nodes,
         filled: true,
         getFillColor: (d: any) => [0, 255, 178, 150],
         stroked: true,

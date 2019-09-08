@@ -1,14 +1,15 @@
 import { AppConfig } from "./data-interfaces";
 
 export const CURRENT_APP_CONFIG: AppConfig = {
-    name: "Default",
     defaultTitle: "Trips",
+    nodeLabel: "Stop",
+    nodeLabelPlural: 'Stops',
     dataSamples: [
         { 
             title: "SE QLD Transport", 
             tripsUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/trips.json',
             geoJsonUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/geojson-stops.json',
-            stopListUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/stops-list.json',
+            nodeListUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/stops-list.json',
             getInitialPartialViewport: () => {
                 return {
                     latitude: -27.44,
@@ -21,7 +22,7 @@ export const CURRENT_APP_CONFIG: AppConfig = {
             title: "SC Transport", 
             tripsUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/trips.json',
             geoJsonUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/geojson-stops.json',
-            stopListUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/stops-list.json',
+            nodeListUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/stops-list.json',
             getInitialPartialViewport: () => {
                 return {
                     latitude: -26.65,

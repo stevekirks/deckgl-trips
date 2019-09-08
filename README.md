@@ -13,8 +13,8 @@ Sample data is of South-East Queensland Bus & Ferry service locations from the [
 ### Features
 -   trip movement
 -   jump to time, adjust speed and trail length
--   highlight trips that stop at a bus stop
--   hover over bus stops to get their Id
+-   highlight trips that pass through a node (in the sample these are bus/ferry stops)
+-   hover over nodes to get their Id
 
 ### Usage
 Clone this repo, set environment variable `REACT_APP_MAPBOX_TOKEN` with a [Mapbox](https://www.mapbox.com/) token, and optionally `REACT_APP_MAPBOX_STYLE` with a mapbox style. These variables can be set in the `.env.development` file. Then:
@@ -24,4 +24,5 @@ npm start
 ```
 
 ### Data format
-Sample data is stored in the `public/data` folder. Not all service stops are shown, only a handful of the most popular ones.
+Sample data is stored in the `public/data` folder. Not all bus/ferry stops are shown, only a handful of the most popular ones.
+If you wish to use different data, the `app-config.ts` file contains labels and URLs that you can update.

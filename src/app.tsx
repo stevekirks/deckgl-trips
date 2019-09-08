@@ -17,7 +17,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
   timestampOffset: number;
   knownUrlParams: KnownUrlParameters;
-  highlighedStopsChangedBeforeReload: boolean;
+  highlighedNodesChangedBeforeReload: boolean;
   intervalId: any;
 
   constructor(props: any) {
@@ -37,26 +37,26 @@ export default class App extends React.Component<AppProps, AppState> {
       friendlyTime: '',
       trailLength: this.knownUrlParams.trailLength || CURRENT_APP_CONFIG.defaultTrailLength,
       percentThroughLoop: 0,
-      highlightedStops: this.knownUrlParams.highlightedStops != null ? this.knownUrlParams.highlightedStops : [],
+      highlightedNodes: this.knownUrlParams.highlightedNodes != null ? this.knownUrlParams.highlightedNodes : [],
       dataSampleIdx: initialDataSampleIdx,
-      stopList: [],
-      stops: null,
+      nodeList: [],
+      nodes: null,
       popupInfo: null,
       viewport: Object.assign({}, CURRENT_APP_CONFIG.getInitialViewport(), CURRENT_APP_CONFIG.dataSamples[initialDataSampleIdx].getInitialPartialViewport()) 
     };
 
     this.timestampOffset = Date.now();
-    this.highlighedStopsChangedBeforeReload = false;
+    this.highlighedNodesChangedBeforeReload = false;
 
     this.handleDataChange = this.handleDataChange.bind(this);
-    this.handleHighlightStopChange = this.handleHighlightStopChange.bind(this);
-    this.handleHighlightStopReload = this.handleHighlightStopReload.bind(this);
+    this.handleHighlightNodeChange = this.handleHighlightNodeChange.bind(this);
+    this.handleHighlightNodeReload = this.handleHighlightNodeReload.bind(this);
     this.handleLoopTimeMinutesChange = this.handleLoopTimeMinutesChange.bind(this);
     this.handleOnHoverGeoPoint = this.handleOnHoverGeoPoint.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleTrailLengthChange = this.handleTrailLengthChange.bind(this);
     this.loadTrips = this.loadTrips.bind(this);
-    this.loadStopList = this.loadStopList.bind(this);
+    this.loadNodeList = this.loadNodeList.bind(this);
     this.updateBoxInfo = this.updateBoxInfo.bind(this);
   }
 
@@ -64,8 +64,8 @@ export default class App extends React.Component<AppProps, AppState> {
     window.addEventListener('resize', this.resize.bind(this));
     this.resize();
     this.loadTrips(this.state.dataSampleIdx);
-    this.loadStopList(this.state.dataSampleIdx);
-    this.loadGeoJsonStops(this.state.dataSampleIdx);
+    this.loadNodeList(this.state.dataSampleIdx);
+    this.loadGeoJsonNodes(this.state.dataSampleIdx);
     this.intervalId = setInterval(() => this.updateBoxInfo(), 1000);
   }
 
@@ -105,24 +105,22 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  loadStopList(dataUrlIdx: number) {
-    requestJson(CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].stopListUrl, (error: any, response: any) => {
+  loadNodeList(dataUrlIdx: number) {
+    requestJson(CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].nodeListUrl, (error: any, response: string[]) => {
       if (error == null) {
-        let stops = response as string[];
-        stops.sort();
+        response.sort();
         this.setState({
-          stopList: stops
+          nodeList: response
         });
       }
     });
   }
 
-  loadGeoJsonStops(dataUrlIdx: number) {
-    requestJson(CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].geoJsonUrl, (error: any, response: any) => {
+  loadGeoJsonNodes(dataUrlIdx: number) {
+    requestJson(CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].geoJsonUrl, (error: any, response: geojson.FeatureCollection<geojson.Point>) => {
       if (error == null) {
-        let stops = response as geojson.FeatureCollection<geojson.Point>;
         this.setState({
-          stops: stops
+          nodes: response
         });
       }
     });
@@ -223,30 +221,30 @@ export default class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  handleHighlightStopChange(highlightedStopsCommaSep: ValueType<any>, action: ActionMeta) {
-    if (highlightedStopsCommaSep == null) {
-      highlightedStopsCommaSep = [];
+  handleHighlightNodeChange(highlightedNodesCommaSep: ValueType<any>, action: ActionMeta) {
+    if (highlightedNodesCommaSep == null) {
+      highlightedNodesCommaSep = [];
     }
-    let highlightedStops: string[] = highlightedStopsCommaSep.map((n: any) => n.value);
-    let highlightedStopsRemoved = this.state.highlightedStops.length > highlightedStops.length;
-    if (this.state.highlightedStops.length !== highlightedStops.length) {
-      this.highlighedStopsChangedBeforeReload = true;
+    let highlightedNodes: string[] = highlightedNodesCommaSep.map((n: any) => n.value);
+    let highlightedNodesRemoved = this.state.highlightedNodes.length > highlightedNodes.length;
+    if (this.state.highlightedNodes.length !== highlightedNodes.length) {
+      this.highlighedNodesChangedBeforeReload = true;
     }
-    this.setState({highlightedStops: highlightedStops});
-    this.knownUrlParams.highlightedStops = highlightedStops;
+    this.setState({highlightedNodes: highlightedNodes});
+    this.knownUrlParams.highlightedNodes = highlightedNodes;
     Utils.updateUrlParameters(this.knownUrlParams);
-    if (highlightedStopsRemoved) {
-      this.handleHighlightStopReload();
+    if (highlightedNodesRemoved) {
+      this.handleHighlightNodeReload();
     }
   }
 
-  handleHighlightStopReload() {
-    if (this.highlighedStopsChangedBeforeReload === true) {
+  handleHighlightNodeReload() {
+    if (this.highlighedNodesChangedBeforeReload === true) {
       // a forceUpdate doesn't update the trip colours, so remove and re-add
       let cacheTrips = this.state.trips;
       this.setState({trips: null});
       setTimeout(() => {
-        this.highlighedStopsChangedBeforeReload = false;
+        this.highlighedNodesChangedBeforeReload = false;
         this.setState({trips: cacheTrips});
       }, 200);
     }
@@ -258,8 +256,8 @@ export default class App extends React.Component<AppProps, AppState> {
       window.history.pushState({}, '', '')
       this.setState({trips: null, dataSampleIdx: dataSampleIdx});
       this.loadTrips(dataSampleIdx);
-      this.loadStopList(dataSampleIdx);
-      this.loadGeoJsonStops(dataSampleIdx);
+      this.loadNodeList(dataSampleIdx);
+      this.loadGeoJsonNodes(dataSampleIdx);
       this.handleViewportChange(CURRENT_APP_CONFIG.dataSamples[dataSampleIdx].getInitialPartialViewport());
       this.knownUrlParams.dataSampleIdx = dataSampleIdx;
       Utils.updateUrlParameters(this.knownUrlParams);
@@ -284,11 +282,11 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    const {friendlyName, trips, friendlyTime, loopLength, loopTimeMinutes, trailLength, percentThroughLoop, highlightedStops, stopList, dataSampleIdx: dataUrlIdx, stops, popupInfo, viewport} = this.state;
+    const {friendlyName, trips, friendlyTime, loopLength, loopTimeMinutes, trailLength, percentThroughLoop, highlightedNodes, nodeList, dataSampleIdx: dataUrlIdx, nodes, popupInfo, viewport} = this.state;
 
     const dataSampleOptions: any[] = CURRENT_APP_CONFIG.dataSamples.map((n: DataSampleUrls, idx: number) => { return { "value": idx, "label": n.title} });
-    const stopListOptions: any[] = stopList.map(n => { return { "value": n, "label": n} });
-    const highlightedStopsVl: any[] = highlightedStops.map(n => { return { "value": n, "label": n} });
+    const nodeListOptions: any[] = nodeList.map(n => { return { "value": n, "label": n} });
+    const highlightedNodesVl: any[] = highlightedNodes.map(n => { return { "value": n, "label": n} });
 
     let loader = <span></span>;
     if (trips == null) {
@@ -299,7 +297,7 @@ export default class App extends React.Component<AppProps, AppState> {
     if (popupInfo != null) {
       popupEle =
         <Popup longitude={popupInfo.geometry.coordinates[0]} latitude={popupInfo.geometry.coordinates[1]} closeButton={false} closeOnClick={false} anchor="bottom-left">
-          <div>Bus Stop {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
+          <div>{CURRENT_APP_CONFIG.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
         </Popup>;
     }
 
@@ -320,10 +318,10 @@ export default class App extends React.Component<AppProps, AppState> {
             mapboxApiAccessToken={CURRENT_APP_CONFIG.mapboxToken}>
             <DeckGLOverlay 
               handleOnHover={this.handleOnHoverGeoPoint}
-              highlightedStops={highlightedStops}
+              highlightedNodes={highlightedNodes}
               loopLength={loopLength}
               loopTimeMilliseconds={this.getLoopTime()}
-              stops={stops!}
+              nodes={nodes!}
               timestampOffset={this.timestampOffset}
               trips={trips}
               trailLength={trailLength}
@@ -354,16 +352,16 @@ export default class App extends React.Component<AppProps, AppState> {
               </div>
             </div>
             <div>
-              <h6>Highlight Stops</h6>
+              <h6>Highlight {CURRENT_APP_CONFIG.nodeLabelPlural}</h6>
               <div>
                 <Select
                   closeMenuOnSelect={false}
                   isMulti
-                  options={stopListOptions}
-                  onChange={this.handleHighlightStopChange}
-                  onMenuClose={this.handleHighlightStopReload}
-                  placeholder="Highlight stop(s)"
-                  value={highlightedStopsVl}
+                  options={nodeListOptions}
+                  onChange={this.handleHighlightNodeChange}
+                  onMenuClose={this.handleHighlightNodeReload}
+                  placeholder={"Highlight " + CURRENT_APP_CONFIG.nodeLabelPlural}
+                  value={highlightedNodesVl}
                 />
               </div>
           </div>
