@@ -2,37 +2,37 @@ import * as geojson from 'geojson';
 
  
 export interface AppConfig {
-    defaultTitle: string,
-    nodeLabel: string,
-    nodeLabelPlural: string,
-    dataSamples: DataSampleUrls[],
-    mapboxStyle: string,
     color: number[],
     colors: number[][],
+    title: string,
+    dataSamples: DataSampleUrls[],
     highlightColor: number[],
-    defaultLoopTimeMinutes: number,
-    defaultTrailLength: number,
+    initialLoopTimeMinutes: number,
+    initialTrailLength: number,
+    initialViewport: Viewport,
+    mapboxStyle: string,
     mapboxToken: string,
-    initialViewport: Viewport
+    nodeLabel: string,
+    nodeLabelPlural: string
 };
 
 export interface AppProps { };
 export interface AppState {
     appConfig: AppConfig,
+    dataSampleIdx: number,
     friendlyName: string,
-    startDate: Date,
-    trips: Trip[] | null,
+    friendlyTime: string,
+    highlightedNodes: string[],
     loopLength: number,
     loopTimeMinutes: number,
-    timeMultiplier: number,
-    friendlyTime: string,
-    trailLength: number,
-    percentThroughLoop: number,
-    dataSampleIdx: number,
-    nodeList: string[],
-    highlightedNodes: string[],
     nodes: geojson.FeatureCollection<geojson.Point> | null,
+    nodeList: string[],
+    percentThroughLoop: number,
     popupInfo: geojson.Feature<geojson.Point> | null,
+    startDate: Date,
+    timeMultiplier: number,
+    trailLength: number,
+    trips: Trip[] | null,
     viewport: Viewport
  };
 
