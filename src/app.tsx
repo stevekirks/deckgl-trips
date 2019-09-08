@@ -17,7 +17,6 @@ export default class App extends React.Component<AppProps, AppState> {
 
   timestampOffset: number;
   knownUrlParams: KnownUrlParameters;
-  highlighedNodesChangedBeforeReload: boolean;
   intervalId: any;
 
   constructor(props: any) {
@@ -46,7 +45,6 @@ export default class App extends React.Component<AppProps, AppState> {
     };
 
     this.timestampOffset = Date.now();
-    this.highlighedNodesChangedBeforeReload = false;
 
     this.handleDataChange = this.handleDataChange.bind(this);
     this.handleHighlightNodeChange = this.handleHighlightNodeChange.bind(this);
@@ -227,9 +225,6 @@ export default class App extends React.Component<AppProps, AppState> {
     }
     let highlightedNodes: string[] = highlightedNodesCommaSep.map((n: any) => n.value);
     let highlightedNodesRemoved = this.state.highlightedNodes.length > highlightedNodes.length;
-    if (this.state.highlightedNodes.length !== highlightedNodes.length) {
-      this.highlighedNodesChangedBeforeReload = true;
-    }
     this.setState({highlightedNodes: highlightedNodes});
     this.knownUrlParams.highlightedNodes = highlightedNodes;
     Utils.updateUrlParameters(this.knownUrlParams);
@@ -239,15 +234,8 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   handleHighlightNodeReload() {
-    if (this.highlighedNodesChangedBeforeReload === true) {
-      // a forceUpdate doesn't update the trip colours, so remove and re-add
-      let cacheTrips = this.state.trips;
-      this.setState({trips: null});
-      setTimeout(() => {
-        this.highlighedNodesChangedBeforeReload = false;
-        this.setState({trips: cacheTrips});
-      }, 200);
-    }
+    // create a new array for trips so the colours are updated
+    this.setState({trips: Object.assign([], this.state.trips)});
   }
 
   handleDataChange(dataSampleOption: ValueType<any>, action: ActionMeta) {    

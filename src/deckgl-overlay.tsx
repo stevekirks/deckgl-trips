@@ -5,7 +5,7 @@ import { CURRENT_APP_CONFIG } from './app-config';
 
 export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, DeckflOverlayState> {
 
-  _animationFrame: number | null;
+  animationFrame: number | null;
 
   constructor(props: any) {
     super(props);
@@ -14,30 +14,45 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
       currentTime: 0
     };
 
-    this._animationFrame = null;
+    this.animationFrame = null;
 
+    this.animate = this.animate.bind(this);
     this.getColor = this.getColor.bind(this);
   }
 
   componentDidMount() {
-    this._animate();
+    this.animate();
   }
 
   componentWillUnmount() {
-    if (this._animationFrame != null) {
-      window.cancelAnimationFrame(this._animationFrame);
+    if (this.animationFrame != null) {
+      window.cancelAnimationFrame(this.animationFrame);
     }
+  }
+
+  animate() {
+    if (this.props.loopLength != null) {
+      const timestamp = Date.now() - this.props.timestampOffset;
+      const loopTime = this.props.loopTimeMilliseconds; // the loop time in milliseconds that deck gl displays
+
+      // 432000 == 5 days
+
+      this.setState({
+        currentTime: (timestamp % loopTime) * (this.props.loopLength / loopTime)
+      });
+    }
+    this.animationFrame = window.requestAnimationFrame(this.animate.bind(this));
   }
   
   getColor(d: Trip) {
     let color = CURRENT_APP_CONFIG.color;
 
-    let tagColor = d.color;
+    const tagColor = d.color;
     if (tagColor != null) {
       color = tagColor;
     }
 
-    if (CURRENT_APP_CONFIG.highlightColor != null && d.nodes != null) {
+    if (d.nodes != null) {
       if (this.props.highlightedNodes.length > 0) {
         let self = this;
         d.nodes.forEach((n: string) => {
@@ -49,20 +64,6 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
     }
 
     return color;
-  }
-
-  _animate() {
-    if (this.props.loopLength != null) {
-      const timestamp = Date.now() - this.props.timestampOffset;
-      const loopTime = this.props.loopTimeMilliseconds; // the loop time in milliseconds that deck gl displays
-
-      // 432000 == 5 days
-
-      this.setState({
-        currentTime: (timestamp % loopTime) * (this.props.loopLength / loopTime)
-      });
-    }
-    this._animationFrame = window.requestAnimationFrame(this._animate.bind(this));
   }
 
   render() {
