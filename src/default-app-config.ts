@@ -1,9 +1,13 @@
 import { AppConfig } from "./data-interfaces";
 
 export const DEFAULT_APP_CONFIG: AppConfig = {
-    defaultTitle: "Trips",
-    nodeLabel: "Stop",
-    nodeLabelPlural: 'Stops',
+    color: [23, 184, 190], // blue
+    colors: [
+        [0, 255, 246], // blue
+        [255, 235, 86], // yellow
+        [255, 109, 245], // pink
+        [0, 255, 119] // green
+    ],
     dataSamples: [
         { 
             title: "SE QLD Transport", 
@@ -28,18 +32,9 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
             }
         }
     ],
-    mapboxStyle: process.env.REACT_APP_MAPBOX_STYLE!,
-    color: [23, 184, 190], // blue
-    colors: [
-        [0, 255, 246], // blue
-        [255, 235, 86], // yellow
-        [255, 109, 245], // pink
-        [0, 255, 119] // green
-    ],
     highlightColor: [253, 128, 93], // orange
-    defaultLoopTimeMinutes: 1,
-    defaultTrailLength: 100,
-    mapboxToken: process.env.REACT_APP_MAPBOX_TOKEN!,
+    initialLoopTimeMinutes: 1,
+    initialTrailLength: 100,
     initialViewport: {
         latitude: -27.44,
         longitude: 153.05,
@@ -49,5 +44,10 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
         bearing: 0,
         width: 500,
         height: 500
-    }
+    },
+    mapboxStyle: process.env.REACT_APP_MAPBOX_STYLE!,
+    mapboxToken: process.env.REACT_APP_MAPBOX_TOKEN!,
+    nodeLabel: "Stop",
+    nodeLabelPlural: 'Stops',
+    title: "Trips"
 };

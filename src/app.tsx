@@ -15,9 +15,9 @@ import { DEFAULT_APP_CONFIG } from './default-app-config';
 
 export default class App extends React.Component<AppProps, AppState> {
 
-  timestampOffset: number;
-  knownUrlParams: KnownUrlParameters;
   intervalId: any;
+  knownUrlParams: KnownUrlParameters;
+  timestampOffset: number;
 
   constructor(props: any) {
     super(props);
@@ -28,20 +28,20 @@ export default class App extends React.Component<AppProps, AppState> {
 
     this.state = {
       appConfig: DEFAULT_APP_CONFIG,
-      friendlyName: '',
-      startDate: new Date(2000, 1, 1, 0, 0, 0),
-      trips: null,
-      loopLength: 1000,
-      loopTimeMinutes: this.knownUrlParams.loopTime || DEFAULT_APP_CONFIG.defaultLoopTimeMinutes,
-      timeMultiplier: 1,
-      friendlyTime: '',
-      trailLength: this.knownUrlParams.trailLength || DEFAULT_APP_CONFIG.defaultTrailLength,
-      percentThroughLoop: 0,
-      highlightedNodes: this.knownUrlParams.highlightedNodes != null ? this.knownUrlParams.highlightedNodes : [],
       dataSampleIdx: initialDataSampleIdx,
+      friendlyName: '',
+      friendlyTime: '',
+      highlightedNodes: this.knownUrlParams.highlightedNodes != null ? this.knownUrlParams.highlightedNodes : [],
+      loopLength: 1000,
+      loopTimeMinutes: this.knownUrlParams.loopTime || DEFAULT_APP_CONFIG.initialLoopTimeMinutes,
       nodeList: [],
       nodes: null,
+      percentThroughLoop: 0,
       popupInfo: null,
+      startDate: new Date(2000, 1, 1, 0, 0, 0),
+      timeMultiplier: 1,
+      trailLength: this.knownUrlParams.trailLength || DEFAULT_APP_CONFIG.initialTrailLength,
+      trips: null,
       viewport: Object.assign({}, DEFAULT_APP_CONFIG.initialViewport, DEFAULT_APP_CONFIG.dataSamples[initialDataSampleIdx].initialPartialViewport)
     };
 
@@ -54,8 +54,8 @@ export default class App extends React.Component<AppProps, AppState> {
     this.handleOnHoverGeoPoint = this.handleOnHoverGeoPoint.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleTrailLengthChange = this.handleTrailLengthChange.bind(this);
-    this.loadTrips = this.loadTrips.bind(this);
     this.loadNodeList = this.loadNodeList.bind(this);
+    this.loadTrips = this.loadTrips.bind(this);
     this.updateBoxInfo = this.updateBoxInfo.bind(this);
   }
 
@@ -76,7 +76,7 @@ export default class App extends React.Component<AppProps, AppState> {
     let url = this.state.appConfig.dataSamples[dataUrlIdx].tripsUrl;
     requestJson(url, (error: any, response: TripContainer) => {
       if (error == null) {
-        let friendlyName = this.state.appConfig.defaultTitle;
+        let friendlyName = this.state.appConfig.title;
         if (response.friendlyName != null) {
           friendlyName = response.friendlyName;
         }
@@ -183,7 +183,7 @@ export default class App extends React.Component<AppProps, AppState> {
       this.knownUrlParams.trailLength = trailLength;
       Utils.updateUrlParameters(this.knownUrlParams);
     } else {
-      this.setState({trailLength: this.state.appConfig.defaultTrailLength});
+      this.setState({trailLength: this.state.appConfig.initialTrailLength});
       this.knownUrlParams.trailLength = null;
       Utils.updateUrlParameters(this.knownUrlParams);
     }
@@ -214,7 +214,7 @@ export default class App extends React.Component<AppProps, AppState> {
       this.knownUrlParams.loopTime = loopTimeMinutes;
       Utils.updateUrlParameters(this.knownUrlParams);
     } else {
-      this.setState({loopTimeMinutes: this.state.appConfig.defaultLoopTimeMinutes});
+      this.setState({loopTimeMinutes: this.state.appConfig.initialLoopTimeMinutes});
       this.knownUrlParams.trailLength = null;
       Utils.updateUrlParameters(this.knownUrlParams);
     }
