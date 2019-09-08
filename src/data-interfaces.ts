@@ -1,40 +1,7 @@
 import * as geojson from 'geojson';
 
-export interface AppProps { };
-export interface AppState { 
-  friendlyName: string,
-  startDate: Date,
-  trips: Trip[] | null,
-  loopLength: number,
-  loopTimeMinutes: number,
-  timeMultiplier: number,
-  friendlyTime: string,
-  trailLength: number,
-  percentThroughLoop: number,
-  dataSampleIdx: number,
-  nodeList: string[],
-  highlightedNodes: string[],
-  nodes: geojson.FeatureCollection<geojson.Point> | null,
-  popupInfo: geojson.Feature<geojson.Point> | null,
-  viewport: Viewport
- };
-
- export interface DeckglOverlayProps {
-    handleOnHover: (info: any) => void,
-    highlightedNodes: string[],
-    loopLength: number,
-    loopTimeMilliseconds: number,
-    nodes: geojson.FeatureCollection<geojson.Point>,
-    timestampOffset: number,
-    trips: Trip[] | null,
-    trailLength: number,
-    viewport: any
- }
- export interface DeckflOverlayState {
-    currentTime: number
- }
  
- export interface AppConfig {
+export interface AppConfig {
     defaultTitle: string,
     nodeLabel: string,
     nodeLabelPlural: string,
@@ -46,15 +13,53 @@ export interface AppState {
     defaultLoopTimeMinutes: number,
     defaultTrailLength: number,
     mapboxToken: string,
-    getInitialViewport: () => Viewport
+    initialViewport: Viewport
 };
+
+export interface AppProps { };
+export interface AppState {
+    appConfig: AppConfig,
+    friendlyName: string,
+    startDate: Date,
+    trips: Trip[] | null,
+    loopLength: number,
+    loopTimeMinutes: number,
+    timeMultiplier: number,
+    friendlyTime: string,
+    trailLength: number,
+    percentThroughLoop: number,
+    dataSampleIdx: number,
+    nodeList: string[],
+    highlightedNodes: string[],
+    nodes: geojson.FeatureCollection<geojson.Point> | null,
+    popupInfo: geojson.Feature<geojson.Point> | null,
+    viewport: Viewport
+ };
+
+ export interface DeckglOverlayProps {
+    color: number[],
+    handleOnHover: (info: any) => void,
+    highlightColor: number[],
+    highlightedNodes: string[],
+    initialViewState: Viewport,
+    loopLength: number,
+    loopTimeMilliseconds: number,
+    nodes: geojson.FeatureCollection<geojson.Point>,
+    timestampOffset: number,
+    trips: Trip[] | null,
+    trailLength: number,
+    viewport: any
+ }
+ export interface DeckflOverlayState {
+    currentTime: number
+ }
 
 export interface DataSampleUrls {
     title: string,
     tripsUrl: string,
     geoJsonUrl: string,
     nodeListUrl: string,
-    getInitialPartialViewport: () => PartialViewport
+    initialPartialViewport: PartialViewport
 }
 
 export interface KnownUrlParameters {
@@ -63,6 +68,12 @@ export interface KnownUrlParameters {
     trailLength: number | null,
     highlightedNodes: string[] | null
 };
+
+export interface PartialViewport {
+    latitude: number,
+    longitude: number,
+    zoom: number
+}
 
 export interface TripContainer {
     startTimestamp: string,
@@ -78,12 +89,6 @@ export interface Trip {
     endTime: number,
     color?: number[],
     segments: Waypoint[]
-}
-
-export interface PartialViewport {
-    latitude: number,
-    longitude: number,
-    zoom: number
 }
 
 export interface Viewport {

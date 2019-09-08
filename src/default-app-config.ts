@@ -1,6 +1,6 @@
 import { AppConfig } from "./data-interfaces";
 
-export const CURRENT_APP_CONFIG: AppConfig = {
+export const DEFAULT_APP_CONFIG: AppConfig = {
     defaultTitle: "Trips",
     nodeLabel: "Stop",
     nodeLabelPlural: 'Stops',
@@ -10,12 +10,10 @@ export const CURRENT_APP_CONFIG: AppConfig = {
             tripsUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/trips.json',
             geoJsonUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/geojson-stops.json',
             nodeListUrl: process.env.REACT_APP_DATA_BASE_URL! + '/south-east-qld/stops-list.json',
-            getInitialPartialViewport: () => {
-                return {
-                    latitude: -27.44,
-                    longitude: 153.05,
-                    zoom: 11
-                };
+            initialPartialViewport: {
+                latitude: -27.44,
+                longitude: 153.05,
+                zoom: 11
             }
         },
         { 
@@ -23,12 +21,10 @@ export const CURRENT_APP_CONFIG: AppConfig = {
             tripsUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/trips.json',
             geoJsonUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/geojson-stops.json',
             nodeListUrl: process.env.REACT_APP_DATA_BASE_URL! + '/sunshine-coast/stops-list.json',
-            getInitialPartialViewport: () => {
-                return {
-                    latitude: -26.65,
-                    longitude: 153.02,
-                    zoom: 10
-                };
+            initialPartialViewport: {
+                latitude: -26.65,
+                longitude: 153.02,
+                zoom: 10
             }
         }
     ],
@@ -44,16 +40,14 @@ export const CURRENT_APP_CONFIG: AppConfig = {
     defaultLoopTimeMinutes: 1,
     defaultTrailLength: 100,
     mapboxToken: process.env.REACT_APP_MAPBOX_TOKEN!,
-    getInitialViewport: () => {
-        return {
-            latitude: -27.44,
-            longitude: 153.05,
-            zoom: 11,
-            maxZoom: 20,
-            pitch: 45,
-            bearing: 0,
-            width: 500,
-            height: 500
-        };
+    initialViewport: {
+        latitude: -27.44,
+        longitude: 153.05,
+        zoom: 11,
+        maxZoom: 20,
+        pitch: 45,
+        bearing: 0,
+        width: 500,
+        height: 500
     }
 };

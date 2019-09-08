@@ -11,7 +11,7 @@ import './app.css';
 import './select.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { ValueType, ActionMeta } from 'react-select/src/types';
-import { CURRENT_APP_CONFIG } from './app-config';
+import { DEFAULT_APP_CONFIG } from './default-app-config';
 
 export default class App extends React.Component<AppProps, AppState> {
 
@@ -27,21 +27,22 @@ export default class App extends React.Component<AppProps, AppState> {
     let initialDataSampleIdx = this.knownUrlParams.dataSampleIdx || 0;
 
     this.state = {
+      appConfig: DEFAULT_APP_CONFIG,
       friendlyName: '',
       startDate: new Date(2000, 1, 1, 0, 0, 0),
       trips: null,
       loopLength: 1000,
-      loopTimeMinutes: this.knownUrlParams.loopTime || CURRENT_APP_CONFIG.defaultLoopTimeMinutes,
+      loopTimeMinutes: this.knownUrlParams.loopTime || DEFAULT_APP_CONFIG.defaultLoopTimeMinutes,
       timeMultiplier: 1,
       friendlyTime: '',
-      trailLength: this.knownUrlParams.trailLength || CURRENT_APP_CONFIG.defaultTrailLength,
+      trailLength: this.knownUrlParams.trailLength || DEFAULT_APP_CONFIG.defaultTrailLength,
       percentThroughLoop: 0,
       highlightedNodes: this.knownUrlParams.highlightedNodes != null ? this.knownUrlParams.highlightedNodes : [],
       dataSampleIdx: initialDataSampleIdx,
       nodeList: [],
       nodes: null,
       popupInfo: null,
-      viewport: Object.assign({}, CURRENT_APP_CONFIG.getInitialViewport(), CURRENT_APP_CONFIG.dataSamples[initialDataSampleIdx].getInitialPartialViewport()) 
+      viewport: Object.assign({}, DEFAULT_APP_CONFIG.initialViewport, DEFAULT_APP_CONFIG.dataSamples[initialDataSampleIdx].initialPartialViewport)
     };
 
     this.timestampOffset = Date.now();
@@ -72,10 +73,10 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   loadTrips(dataUrlIdx: number) {
-    let url = CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].tripsUrl;
+    let url = this.state.appConfig.dataSamples[dataUrlIdx].tripsUrl;
     requestJson(url, (error: any, response: TripContainer) => {
       if (error == null) {
-        let friendlyName = CURRENT_APP_CONFIG.defaultTitle;
+        let friendlyName = this.state.appConfig.defaultTitle;
         if (response.friendlyName != null) {
           friendlyName = response.friendlyName;
         }
@@ -87,7 +88,7 @@ export default class App extends React.Component<AppProps, AppState> {
         // allocate colours if there's a small number of trips
         if (trips.length > 0 && trips.length <= 10) {
           for (let i = 0; i < trips.length; i++) {
-            trips[i].color = CURRENT_APP_CONFIG.colors[i % CURRENT_APP_CONFIG.colors.length];
+            trips[i].color = this.state.appConfig.colors[i % this.state.appConfig.colors.length];
           }
         }
 
@@ -104,7 +105,7 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   loadNodeList(dataUrlIdx: number) {
-    requestJson(CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].nodeListUrl, (error: any, response: string[]) => {
+    requestJson(this.state.appConfig.dataSamples[dataUrlIdx].nodeListUrl, (error: any, response: string[]) => {
       if (error == null) {
         response.sort();
         this.setState({
@@ -115,7 +116,7 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   loadGeoJsonNodes(dataUrlIdx: number) {
-    requestJson(CURRENT_APP_CONFIG.dataSamples[dataUrlIdx].geoJsonUrl, (error: any, response: geojson.FeatureCollection<geojson.Point>) => {
+    requestJson(this.state.appConfig.dataSamples[dataUrlIdx].geoJsonUrl, (error: any, response: geojson.FeatureCollection<geojson.Point>) => {
       if (error == null) {
         this.setState({
           nodes: response
@@ -182,7 +183,7 @@ export default class App extends React.Component<AppProps, AppState> {
       this.knownUrlParams.trailLength = trailLength;
       Utils.updateUrlParameters(this.knownUrlParams);
     } else {
-      this.setState({trailLength: CURRENT_APP_CONFIG.defaultTrailLength});
+      this.setState({trailLength: this.state.appConfig.defaultTrailLength});
       this.knownUrlParams.trailLength = null;
       Utils.updateUrlParameters(this.knownUrlParams);
     }
@@ -213,13 +214,13 @@ export default class App extends React.Component<AppProps, AppState> {
       this.knownUrlParams.loopTime = loopTimeMinutes;
       Utils.updateUrlParameters(this.knownUrlParams);
     } else {
-      this.setState({loopTimeMinutes: CURRENT_APP_CONFIG.defaultLoopTimeMinutes});
+      this.setState({loopTimeMinutes: this.state.appConfig.defaultLoopTimeMinutes});
       this.knownUrlParams.trailLength = null;
       Utils.updateUrlParameters(this.knownUrlParams);
     }
   }
 
-  handleHighlightNodeChange(highlightedNodesCommaSep: ValueType<any>, action: ActionMeta) {
+  handleHighlightNodeChange(highlightedNodesCommaSep: ValueType<any>) {
     if (highlightedNodesCommaSep == null) {
       highlightedNodesCommaSep = [];
     }
@@ -238,15 +239,16 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({trips: Object.assign([], this.state.trips)});
   }
 
-  handleDataChange(dataSampleOption: ValueType<any>, action: ActionMeta) {    
+  handleDataChange(dataSampleOption: ValueType<any>) {    
     if (dataSampleOption != null && this.state.dataSampleIdx !== dataSampleOption.value) {
+      this.handleHighlightNodeChange([]);
       let dataSampleIdx = dataSampleOption.value as number;
       window.history.pushState({}, '', '')
       this.setState({trips: null, dataSampleIdx: dataSampleIdx});
       this.loadTrips(dataSampleIdx);
       this.loadNodeList(dataSampleIdx);
       this.loadGeoJsonNodes(dataSampleIdx);
-      this.handleViewportChange(CURRENT_APP_CONFIG.dataSamples[dataSampleIdx].getInitialPartialViewport());
+      this.handleViewportChange(this.state.appConfig.dataSamples[dataSampleIdx].initialPartialViewport);
       this.knownUrlParams.dataSampleIdx = dataSampleIdx;
       Utils.updateUrlParameters(this.knownUrlParams);
     }
@@ -270,9 +272,9 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    const {friendlyName, trips, friendlyTime, loopLength, loopTimeMinutes, trailLength, percentThroughLoop, highlightedNodes, nodeList, dataSampleIdx: dataUrlIdx, nodes, popupInfo, viewport} = this.state;
+    const {appConfig, friendlyName, trips, friendlyTime, loopLength, loopTimeMinutes, trailLength, percentThroughLoop, highlightedNodes, nodeList, dataSampleIdx: dataUrlIdx, nodes, popupInfo, viewport} = this.state;
 
-    const dataSampleOptions: any[] = CURRENT_APP_CONFIG.dataSamples.map((n: DataSampleUrls, idx: number) => { return { "value": idx, "label": n.title} });
+    const dataSampleOptions: any[] = this.state.appConfig.dataSamples.map((n: DataSampleUrls, idx: number) => { return { "value": idx, "label": n.title} });
     const nodeListOptions: any[] = nodeList.map(n => { return { "value": n, "label": n} });
     const highlightedNodesVl: any[] = highlightedNodes.map(n => { return { "value": n, "label": n} });
 
@@ -285,12 +287,12 @@ export default class App extends React.Component<AppProps, AppState> {
     if (popupInfo != null) {
       popupEle =
         <Popup longitude={popupInfo.geometry.coordinates[0]} latitude={popupInfo.geometry.coordinates[1]} closeButton={false} closeOnClick={false} anchor="bottom-left">
-          <div>{CURRENT_APP_CONFIG.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
+          <div>{this.state.appConfig.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
         </Popup>;
     }
 
     let selectDataEle = null;
-    if (CURRENT_APP_CONFIG.dataSamples.length > 1) {
+    if (this.state.appConfig.dataSamples.length > 1) {
       selectDataEle = <div><h6>Select Data</h6><div><Select options={dataSampleOptions} onChange={this.handleDataChange} value={dataSampleOptions[dataUrlIdx]} /></div></div>;
     }
 
@@ -300,13 +302,16 @@ export default class App extends React.Component<AppProps, AppState> {
         <div id="divdeckgl">
           <ReactMapGL 
             {...viewport}
-            mapStyle={CURRENT_APP_CONFIG.mapboxStyle}
+            mapStyle={this.state.appConfig.mapboxStyle}
             dragRotate={true}
             onViewportChange={this.handleViewportChange.bind(this)}
-            mapboxApiAccessToken={CURRENT_APP_CONFIG.mapboxToken}>
+            mapboxApiAccessToken={this.state.appConfig.mapboxToken}>
             <DeckGLOverlay 
+              color={appConfig.color}
               handleOnHover={this.handleOnHoverGeoPoint}
+              highlightColor={appConfig.highlightColor}
               highlightedNodes={highlightedNodes}
+              initialViewState={appConfig.initialViewport}
               loopLength={loopLength}
               loopTimeMilliseconds={this.getLoopTime()}
               nodes={nodes!}
@@ -340,7 +345,7 @@ export default class App extends React.Component<AppProps, AppState> {
               </div>
             </div>
             <div>
-              <h6>Highlight {CURRENT_APP_CONFIG.nodeLabelPlural}</h6>
+              <h6>Highlight {this.state.appConfig.nodeLabelPlural}</h6>
               <div>
                 <Select
                   closeMenuOnSelect={false}
@@ -348,7 +353,7 @@ export default class App extends React.Component<AppProps, AppState> {
                   options={nodeListOptions}
                   onChange={this.handleHighlightNodeChange}
                   onMenuClose={this.handleHighlightNodeReload}
-                  placeholder={"Highlight " + CURRENT_APP_CONFIG.nodeLabelPlural}
+                  placeholder={"Highlight " + this.state.appConfig.nodeLabelPlural}
                   value={highlightedNodesVl}
                 />
               </div>
