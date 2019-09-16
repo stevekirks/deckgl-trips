@@ -287,7 +287,7 @@ export default class App extends React.Component<AppProps, AppState> {
     if (popupInfo != null) {
       popupEle =
         <Popup longitude={popupInfo.geometry.coordinates[0]} latitude={popupInfo.geometry.coordinates[1]} closeButton={false} closeOnClick={false} anchor="bottom-left">
-          <div>{this.state.appConfig.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
+          <div className="popup-inner">{this.state.appConfig.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
         </Popup>;
     }
 
