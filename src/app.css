@@ -243,3 +243,7 @@ font-size: 15px;
     padding: 1px 3px;
     margin: 1px;
 }
+
+.popup-inner {
+  color: black;
+}
