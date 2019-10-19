@@ -10,7 +10,7 @@ import * as geojson from 'geojson';
 import './app.css';
 import './select.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { ValueType, ActionMeta } from 'react-select/src/types';
+import { ValueType } from 'react-select/src/types';
 import { DEFAULT_APP_CONFIG } from './default-app-config';
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -31,6 +31,7 @@ export default class App extends React.Component<AppProps, AppState> {
       dataSampleIdx: initialDataSampleIdx,
       friendlyName: '',
       friendlyTime: '',
+      hideInfoBox: false,
       highlightedNodes: this.knownUrlParams.highlightedNodes != null ? this.knownUrlParams.highlightedNodes : [],
       loopLength: 1000,
       loopTimeMinutes: this.knownUrlParams.loopTime || DEFAULT_APP_CONFIG.initialLoopTimeMinutes,
@@ -271,8 +272,14 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  handleInfoBoxVisibility(hideInfoBox: boolean) {
+    this.setState({
+      hideInfoBox: hideInfoBox
+    });
+  }
+
   render() {
-    const {appConfig, friendlyName, trips, friendlyTime, loopLength, loopTimeMinutes, trailLength, percentThroughLoop, highlightedNodes, nodeList, dataSampleIdx: dataUrlIdx, nodes, popupInfo, viewport} = this.state;
+    const {appConfig, dataSampleIdx, friendlyName, friendlyTime, hideInfoBox, highlightedNodes, loopLength, loopTimeMinutes, nodeList, nodes, percentThroughLoop, popupInfo, trailLength, trips, viewport} = this.state;
 
     const dataSampleOptions: any[] = this.state.appConfig.dataSamples.map((n: DataSampleUrls, idx: number) => { return { "value": idx, "label": n.title} });
     const nodeListOptions: any[] = nodeList.map(n => { return { "value": n, "label": n} });
@@ -293,7 +300,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
     let selectDataEle = null;
     if (this.state.appConfig.dataSamples.length > 1) {
-      selectDataEle = <div><h6>Select Data</h6><div><Select options={dataSampleOptions} onChange={this.handleDataChange} value={dataSampleOptions[dataUrlIdx]} /></div></div>;
+      selectDataEle = <div><h6>Select Data</h6><div><Select options={dataSampleOptions} onChange={this.handleDataChange} value={dataSampleOptions[dataSampleIdx]} /></div></div>;
     }
 
     return (
@@ -325,7 +332,8 @@ export default class App extends React.Component<AppProps, AppState> {
         </div>
         <div id="top-left-container">
           <div id="title-box"><h1>{friendlyName}</h1></div>
-          <div id="divinfo">
+          <div id="divinfo" className={hideInfoBox ? "hide" : ""}>
+            <button id="btnHideInfoBox" className="btn-transparent right-align" onClick={() => this.handleInfoBoxVisibility(true)}>X</button>
             {selectDataEle}
             <h3>{friendlyTime}</h3>
             <div>
@@ -357,8 +365,9 @@ export default class App extends React.Component<AppProps, AppState> {
                   value={highlightedNodesVl}
                 />
               </div>
+            </div>
           </div>
-          </div>
+          <button id="btnShowInfoBox" className={"btn-transparent " + (hideInfoBox ? "" : "hide")} onClick={() => this.handleInfoBoxVisibility(false)}>SHOW INFO BOX</button>
         </div>
       </div>
     );

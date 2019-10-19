@@ -22,6 +22,7 @@ export interface AppState {
     dataSampleIdx: number,
     friendlyName: string,
     friendlyTime: string,
+    hideInfoBox: boolean,
     highlightedNodes: string[],
     loopLength: number,
     loopTimeMinutes: number,
