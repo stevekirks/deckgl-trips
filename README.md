@@ -8,7 +8,7 @@
 
 This is an example of the deck.gl trips layer. Built using [deck.gl](https://uber.github.io/deck.gl) and [Create-React-App](https://create-react-app.dev) with [Typescript](https://create-react-app.dev/docs/adding-typescript/).
 
-Sample data is of South-East Queensland Bus & Ferry service locations from the [Translink real-time data feed](https://data.qld.gov.au/dataset/translink-real-time-data), transformed to suit.
+Sample data is a short timespan of South-East Queensland Bus & Ferry service locations from the [Translink data feed](https://data.qld.gov.au/dataset/translink-real-time-data), transformed to suit.
 
 ### Features
 -   Trip movement
