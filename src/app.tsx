@@ -12,6 +12,12 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { ValueType } from 'react-select/src/types';
 import { DEFAULT_APP_CONFIG } from './default-app-config';
 
+// Workaround: next 4 lines are to fix issue https://github.com/mapbox/mapbox-gl-js/issues/10565
+// Install packages worker-loader & mapbox-gl
+import mapboxgl from "mapbox-gl";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+(mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+
 export default class App extends React.Component<AppProps, AppState> {
 
   intervalId: any;
