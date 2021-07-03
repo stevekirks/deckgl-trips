@@ -1,10 +1,10 @@
 <p align="right">
-  <a href="https://dev.azure.com/stevekirks/Public/_build/latest?definitionId=2&branchName=master">
-    <img src="https://dev.azure.com/stevekirks/Public/_apis/build/status/deckgl-trips?branchName=master" alt="build" />
+  <a href="https://github.com/stevekirks/deckgl-trips/actions/workflows/main.yml/badge.svg">
+    <img src="https://github.com/stevekirks/deckgl-trips/actions/workflows/main.yml/badge.svg" alt="build" />
   </a>
 </p>
 
-<h1 align="center">deck.gl trips | <a href="https://stevekirks.github.io/deckgl-trips" target="_blank">demo</a></h1>
+<h1 align="center">deck.gl trips | <a href="https://stevekirks.github.io/deckgl-trips" target="_blank">example</a></h1>
 
 This is an example of the deck.gl trips layer. Built using [deck.gl](https://deck.gl) and [Create-React-App](https://create-react-app.dev) with [Typescript](https://create-react-app.dev/docs/adding-typescript/).
 
