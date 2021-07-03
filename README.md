@@ -1,6 +1,6 @@
 <p align="right">
-  <a href="https://github.com/stevekirks/deckgl-trips/actions/workflows/main.yml/badge.svg">
-    <img src="https://github.com/stevekirks/deckgl-trips/actions/workflows/main.yml/badge.svg" alt="build" />
+  <a href="https://github.com/stevekirks/deckgl-trips/actions/workflows/deploy.yml">
+    <img src="https://github.com/stevekirks/deckgl-trips/actions/workflows/deploy.yml/badge.svg" alt="build" />
   </a>
 </p>
 
