@@ -1,10 +1,9 @@
 import * as React from 'react';
 import ReactMapGL, {Popup} from 'react-map-gl';
-import {json as requestJson} from 'd3-request';
 import DeckGLOverlay from './deckgl-overlay';
 import Loader from './loader';
 import {AppProps, AppState, KnownUrlParameters, TripContainer, DataSampleUrls} from './data-interfaces';
-import Utils from './utils';
+import * as Utils from './utils';
 import Select from 'react-select';
 import * as geojson from 'geojson';
 import './app.css';
@@ -21,7 +20,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
   constructor(props: any) {
     super(props);
-
+    
     this.knownUrlParams = Utils.getKnownUrlParameters();
 
     let initialDataSampleIdx = this.knownUrlParams.dataSampleIdx || 0;
@@ -75,54 +74,95 @@ export default class App extends React.Component<AppProps, AppState> {
 
   loadTrips(dataUrlIdx: number) {
     let url = this.state.appConfig.dataSamples[dataUrlIdx].tripsUrl;
-    requestJson(url, (error: any, response: TripContainer) => {
-      if (error == null) {
-        let friendlyName = this.state.appConfig.title;
-        if (response.friendlyName != null) {
-          friendlyName = response.friendlyName;
+    let _this: App = this;
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Accept": "application/json; charset=utf-8"
         }
-        let startDate = new Date(Date.parse(response.startTimestamp));
-        let timeMultiplier = response.timeMultiplier;
-        let trips = response.trips;
-        let loopLength = response.loopLength;
+    }).then(function (fetchResponse) {
+        if (fetchResponse.status === 200) {
+          fetchResponse.json().then((response: TripContainer) => {
+            let friendlyName = _this.state.appConfig.title;
+            if (response.friendlyName != null) {
+              friendlyName = response.friendlyName;
+            }
+            let startDate = Number(response.startTimestamp) 
+              ? new Date(response.startTimestamp as number * 1000)
+              : new Date(Date.parse(response.startTimestamp as string));
+            let timeMultiplier = response.timeMultiplier;
+            let trips = response.trips;
+            let loopLength = response.loopLength;
 
-        // allocate colours if there's a small number of trips
-        if (trips.length > 0 && trips.length <= 10) {
-          for (let i = 0; i < trips.length; i++) {
-            trips[i].color = this.state.appConfig.colors[i % this.state.appConfig.colors.length];
-          }
+            // allocate colours if there's a small number of trips
+            if (trips.length > 0 && trips.length <= 10) {
+              for (let i = 0; i < trips.length; i++) {
+                trips[i].color = _this.state.appConfig.colors[i % _this.state.appConfig.colors.length];
+              }
+            }
+
+            _this.timestampOffset = Date.now();
+            _this.setState({
+              friendlyName: friendlyName,
+              startDate: startDate,
+              trips: trips,
+              loopLength: loopLength,
+              timeMultiplier: timeMultiplier
+            });
+          });
+        } else {
+          console.log('Sorry, something went wrong (' + fetchResponse.status + ')');
         }
-
-        this.timestampOffset = Date.now();
-        this.setState({
-          friendlyName: friendlyName,
-          startDate: startDate,
-          trips: trips,
-          loopLength: loopLength,
-          timeMultiplier: timeMultiplier
-        });
-      }
+    }).catch(function (error) {
+        console.log(error);
     });
   }
 
   loadNodeList(dataUrlIdx: number) {
-    requestJson(this.state.appConfig.dataSamples[dataUrlIdx].nodeListUrl, (error: any, response: string[]) => {
-      if (error == null) {
-        response.sort();
-        this.setState({
-          nodeList: response
-        });
+    let _this: App = this;
+    fetch(this.state.appConfig.dataSamples[dataUrlIdx].nodeListUrl, {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Accept": "application/json; charset=utf-8"
       }
+    }).then(function (fetchResponse) {
+        if (fetchResponse.status === 200) {
+          fetchResponse.json().then((response: string[]) => {
+            response.sort();
+            _this.setState({
+              nodeList: response
+            });
+          });
+        } else {
+          console.log('Sorry, something went wrong (' + fetchResponse.status + ')');
+        }
+    }).catch(function (error) {
+        console.log(error);
     });
   }
 
   loadGeoJsonNodes(dataUrlIdx: number) {
-    requestJson(this.state.appConfig.dataSamples[dataUrlIdx].geoJsonUrl, (error: any, response: geojson.FeatureCollection<geojson.Point>) => {
-      if (error == null) {
-        this.setState({
-          nodes: response
-        });
+    let _this: App = this;
+    fetch(this.state.appConfig.dataSamples[dataUrlIdx].geoJsonUrl, {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Accept": "application/json; charset=utf-8"
       }
+    }).then(function (fetchResponse) {
+        if (fetchResponse.status === 200) {
+          fetchResponse.json().then((response: geojson.FeatureCollection<geojson.Point>) => {
+            _this.setState({
+              nodes: response
+            });
+          });
+        } else {
+          console.log('Sorry, something went wrong (' + fetchResponse.status + ')');
+        }
+    }).catch(function (error) {
+        console.log(error);
     });
   }
 
@@ -221,7 +261,7 @@ export default class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  handleHighlightNodeChange(highlightedNodesCommaSep: ValueType<any>) {
+  handleHighlightNodeChange(highlightedNodesCommaSep: ValueType<any, any>) {
     if (highlightedNodesCommaSep == null) {
       highlightedNodesCommaSep = [];
     }
@@ -240,7 +280,7 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({trips: Object.assign([], this.state.trips)});
   }
 
-  handleDataChange(dataSampleOption: ValueType<any>) {    
+  handleDataChange(dataSampleOption: ValueType<any, any>) {    
     if (dataSampleOption != null && this.state.dataSampleIdx !== dataSampleOption.value) {
       this.handleHighlightNodeChange([]);
       let dataSampleIdx = dataSampleOption.value as number;

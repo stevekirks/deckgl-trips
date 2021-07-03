@@ -1,6 +1,7 @@
 import * as React from 'react';
 import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl';
 import {DeckglOverlayProps, Trip, DeckflOverlayState, Waypoint} from './data-interfaces';
+import { RGBAColor, Position } from '@deck.gl/core';
 
 export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, DeckflOverlayState> {
 
@@ -58,7 +59,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
       }
     }
 
-    return color;
+    return color as RGBAColor;
   }
 
   render() {
@@ -71,7 +72,7 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
       layers.push(new TripsLayer({
         id: 'trips',
         data: trips,
-        getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates),
+        getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates as Position),
         getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
         getColor: this.getColor,
         opacity: 0.3,

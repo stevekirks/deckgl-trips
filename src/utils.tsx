@@ -40,58 +40,56 @@ function updateKeyInString(keysString: string, sParam: string, sValue: string): 
   return sURLVariables.join('&');
 }
 
-export default {
-  getKnownUrlParameters(): KnownUrlParameters {
-    let result: KnownUrlParameters = {
-      dataSampleIdx: null,
-      loopTime: null,
-      trailLength: null,
-      highlightedNodes: null
-    };
+export function getKnownUrlParameters(): KnownUrlParameters {
+  let result: KnownUrlParameters = {
+    dataSampleIdx: null,
+    loopTime: null,
+    trailLength: null,
+    highlightedNodes: null
+  };
 
-    // Convert day to dataUrlIdx
-    let dataIdx = getNumber(getUrlParam(PARAM_DATA_IDX));
-    if (dataIdx != null && dataIdx >= 0) {
-      result.dataSampleIdx = dataIdx;
-    }
-
-    // Validate loopTime
-    let loopTime = getNumber(getUrlParam(PARAM_LOOPTIME));
-    if (loopTime != null && loopTime > 0 && loopTime < 999999) {
-      result.loopTime = loopTime;
-    }
-
-    // Validate trailLength
-    let trailLength = getNumber(getUrlParam(PARAM_TRAILLENGTH));
-    if (trailLength != null && trailLength > 0 && trailLength < 999999) {
-      result.trailLength = trailLength;
-    }
-
-    // Validate highlightNode
-    let highlightNodes = getUrlParam(PARAM_HIGHLIGHTNODES);
-    if (highlightNodes != null && highlightNodes.length > 0) {
-      result.highlightedNodes = highlightNodes.split(',');
-    }
-
-    return result;
-  },
-
-  updateUrlParameters(params: KnownUrlParameters) {
-    let newStateStr = decodeURIComponent(window.location.search.substring(1));
-    if (params.dataSampleIdx != null) {
-      newStateStr = updateKeyInString(newStateStr, PARAM_DATA_IDX, String(params.dataSampleIdx));
-    }
-    if (params.loopTime != null) {
-      newStateStr = updateKeyInString(newStateStr, PARAM_LOOPTIME, String(params.loopTime));
-    }
-    if (params.trailLength != null) {
-      newStateStr = updateKeyInString(newStateStr, PARAM_TRAILLENGTH, String(params.trailLength));
-    }
-    if (params.highlightedNodes != null) {
-      newStateStr = updateKeyInString(newStateStr, PARAM_HIGHLIGHTNODES, params.highlightedNodes.join(','));
-    }
-    
-    let queryFilters = "?" + newStateStr;
-    window.history.pushState({}, "", queryFilters);
+  // Convert day to dataUrlIdx
+  let dataIdx = getNumber(getUrlParam(PARAM_DATA_IDX));
+  if (dataIdx != null && dataIdx >= 0) {
+    result.dataSampleIdx = dataIdx;
   }
+
+  // Validate loopTime
+  let loopTime = getNumber(getUrlParam(PARAM_LOOPTIME));
+  if (loopTime != null && loopTime > 0 && loopTime < 999999) {
+    result.loopTime = loopTime;
+  }
+
+  // Validate trailLength
+  let trailLength = getNumber(getUrlParam(PARAM_TRAILLENGTH));
+  if (trailLength != null && trailLength > 0 && trailLength < 999999) {
+    result.trailLength = trailLength;
+  }
+
+  // Validate highlightNode
+  let highlightNodes = getUrlParam(PARAM_HIGHLIGHTNODES);
+  if (highlightNodes != null && highlightNodes.length > 0) {
+    result.highlightedNodes = highlightNodes.split(',');
+  }
+
+  return result;
+}
+
+export function updateUrlParameters(params: KnownUrlParameters) {
+  let newStateStr = decodeURIComponent(window.location.search.substring(1));
+  if (params.dataSampleIdx != null) {
+    newStateStr = updateKeyInString(newStateStr, PARAM_DATA_IDX, String(params.dataSampleIdx));
+  }
+  if (params.loopTime != null) {
+    newStateStr = updateKeyInString(newStateStr, PARAM_LOOPTIME, String(params.loopTime));
+  }
+  if (params.trailLength != null) {
+    newStateStr = updateKeyInString(newStateStr, PARAM_TRAILLENGTH, String(params.trailLength));
+  }
+  if (params.highlightedNodes != null) {
+    newStateStr = updateKeyInString(newStateStr, PARAM_HIGHLIGHTNODES, params.highlightedNodes.join(','));
+  }
+  
+  let queryFilters = "?" + newStateStr;
+  window.history.pushState({}, "", queryFilters);
 }

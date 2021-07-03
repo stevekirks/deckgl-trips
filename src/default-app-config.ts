@@ -33,7 +33,7 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
         }
     ],
     highlightColor: [253, 128, 93], // orange
-    initialLoopTimeMinutes: 1,
+    initialLoopTimeMinutes: 3,
     initialTrailLength: 100,
     initialViewport: {
         latitude: -27.44,

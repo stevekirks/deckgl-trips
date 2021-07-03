@@ -77,7 +77,7 @@ export interface PartialViewport {
 }
 
 export interface TripContainer {
-    startTimestamp: string,
+    startTimestamp: string | number,
     loopLength: number,
     timeMultiplier: number,
     friendlyName?: string,
