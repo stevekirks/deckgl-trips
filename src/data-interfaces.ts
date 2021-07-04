@@ -1,6 +1,6 @@
 import * as geojson from 'geojson';
 
- 
+
 export interface AppConfig {
     color: number[],
     colors: number[][],
@@ -16,44 +16,20 @@ export interface AppConfig {
     nodeLabelPlural: string
 };
 
-export interface AppProps { };
-export interface AppState {
-    appConfig: AppConfig,
-    dataSampleIdx: number,
-    friendlyName: string,
-    friendlyTime: string,
-    hideInfoBox: boolean,
-    highlightedNodes: string[],
-    loopLength: number,
-    loopTimeMinutes: number,
-    nodes: geojson.FeatureCollection<geojson.Point> | null,
-    nodeList: string[],
-    percentThroughLoop: number,
-    popupInfo: geojson.Feature<geojson.Point> | null,
-    startDate: Date,
-    timeMultiplier: number,
-    trailLength: number,
-    trips: Trip[] | null,
-    viewport: Viewport
- };
-
- export interface DeckglOverlayProps {
+export interface DeckglOverlayProps {
     color: number[],
     handleOnHover: (info: any) => void,
     highlightColor: number[],
     highlightedNodes: string[],
     initialViewState: Viewport,
     loopLength: number,
-    loopTimeMilliseconds: number,
+    loopTimeMinutes: number,
     nodes: geojson.FeatureCollection<geojson.Point>,
     timestampOffset: number,
     trips: Trip[] | null,
     trailLength: number,
     viewport: any
- }
- export interface DeckflOverlayState {
-    currentTime: number
- }
+}
 
 export interface DataSampleUrls {
     title: string,

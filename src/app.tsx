@@ -1,8 +1,8 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import ReactMapGL, {Popup} from 'react-map-gl';
 import DeckGLOverlay from './deckgl-overlay';
 import Loader from './loader';
-import {AppProps, AppState, KnownUrlParameters, TripContainer, DataSampleUrls} from './data-interfaces';
+import {AppConfig, KnownUrlParameters, Trip, TripContainer, DataSampleUrls} from './data-interfaces';
 import * as Utils from './utils';
 import Select from 'react-select';
 import * as geojson from 'geojson';
@@ -18,69 +18,75 @@ import mapboxgl from "mapbox-gl";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
-export default class App extends React.Component<AppProps, AppState> {
+const App = () => {
 
-  intervalId: any;
-  knownUrlParams: KnownUrlParameters;
-  timestampOffset: number;
+  let knownUrlParams: KnownUrlParameters = Utils.getKnownUrlParameters();
+  let initialDataSampleIdx = knownUrlParams.dataSampleIdx || 0;
 
-  constructor(props: any) {
-    super(props);
-    
-    this.knownUrlParams = Utils.getKnownUrlParameters();
+  const [appConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG);
+  const [dataSampleIdx, setDataSampleIdx] = useState(initialDataSampleIdx);
+  const [friendlyName, setFriendlyName] = useState('');
+  const [friendlyTime, setFriendlyTime] = useState('');
+  const [hideInfoBox, setHideInfoBox] = useState(false);
+  const [highlightedNodes, setHighlightedNodes] = useState(knownUrlParams.highlightedNodes != null ? knownUrlParams.highlightedNodes : []);
+  const [loopLength, setLoopLength] = useState(1000);
+  const [loopTimeMinutes, setLoopTimeMinutes] = useState(knownUrlParams.loopTime || DEFAULT_APP_CONFIG.initialLoopTimeMinutes);
+  const [nodeList, setNodeList] = useState<string[]>([]);
+  const [nodes, setNodes] = useState<geojson.FeatureCollection<geojson.Point> | null>(null);
+  const [percentThroughLoop, setPercentThroughLoop] = useState(0);
+  const [popupInfo, setPopupInfo] = useState<any>(null);
+  const [startDate, setStartDate] = useState<Date>(new Date(2000, 1, 1, 0, 0, 0));
+  const [timestampOffset, setTimestampOffset] = useState<number>(Date.now());
+  const [timeMultiplier, setTimeMultiplier] = useState(1);
+  const [trailLength, setTrailLength] = useState(knownUrlParams.trailLength || DEFAULT_APP_CONFIG.initialTrailLength);
+  const [trips, setTrips] = useState<Trip[] | null>(null);
+  const [updateBoxInfoLoopToggle, setUpdateBoxInfoLoopToggle] = useState(false);
+  const [viewport, setViewport] = useState(Object.assign({}, DEFAULT_APP_CONFIG.initialViewport, DEFAULT_APP_CONFIG.dataSamples[initialDataSampleIdx].initialPartialViewport));
 
-    let initialDataSampleIdx = this.knownUrlParams.dataSampleIdx || 0;
-
-    this.state = {
-      appConfig: DEFAULT_APP_CONFIG,
-      dataSampleIdx: initialDataSampleIdx,
-      friendlyName: '',
-      friendlyTime: '',
-      hideInfoBox: false,
-      highlightedNodes: this.knownUrlParams.highlightedNodes != null ? this.knownUrlParams.highlightedNodes : [],
-      loopLength: 1000,
-      loopTimeMinutes: this.knownUrlParams.loopTime || DEFAULT_APP_CONFIG.initialLoopTimeMinutes,
-      nodeList: [],
-      nodes: null,
-      percentThroughLoop: 0,
-      popupInfo: null,
-      startDate: new Date(2000, 1, 1, 0, 0, 0),
-      timeMultiplier: 1,
-      trailLength: this.knownUrlParams.trailLength || DEFAULT_APP_CONFIG.initialTrailLength,
-      trips: null,
-      viewport: Object.assign({}, DEFAULT_APP_CONFIG.initialViewport, DEFAULT_APP_CONFIG.dataSamples[initialDataSampleIdx].initialPartialViewport)
+  useEffect(() => {
+    window.addEventListener('resize', resize);
+    resize();
+    loadTrips(dataSampleIdx);
+    loadNodeList(dataSampleIdx);
+    loadGeoJsonNodes(dataSampleIdx);
+    const intervalId = setInterval(() => setUpdateBoxInfoLoopToggle(updateBoxInfoLoopToggle => !updateBoxInfoLoopToggle), 1000);
+    return () => {
+      clearInterval(intervalId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    this.timestampOffset = Date.now();
+  useEffect(() => {
+    // Update Box Info
 
-    this.handleDataChange = this.handleDataChange.bind(this);
-    this.handleHighlightNodeChange = this.handleHighlightNodeChange.bind(this);
-    this.handleHighlightNodeReload = this.handleHighlightNodeReload.bind(this);
-    this.handleLoopTimeMinutesChange = this.handleLoopTimeMinutesChange.bind(this);
-    this.handleOnHoverGeoPoint = this.handleOnHoverGeoPoint.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
-    this.handleTrailLengthChange = this.handleTrailLengthChange.bind(this);
-    this.loadNodeList = this.loadNodeList.bind(this);
-    this.loadTrips = this.loadTrips.bind(this);
-    this.updateBoxInfo = this.updateBoxInfo.bind(this);
-  }
+    const toFriendlyTime = (timeSinceStart: number) => {
+      let realTimeSinceStart = timeSinceStart / timeMultiplier;
+      let currentDate = new Date(startDate.getTime() + realTimeSinceStart * 1000);
+      let minutes = String(currentDate.getMinutes());
+      if (minutes.length < 2) {
+        minutes = '0' + minutes;
+      }
+      return currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + minutes;
+    }
 
-  componentDidMount() {
-    window.addEventListener('resize', this.resize.bind(this));
-    this.resize();
-    this.loadTrips(this.state.dataSampleIdx);
-    this.loadNodeList(this.state.dataSampleIdx);
-    this.loadGeoJsonNodes(this.state.dataSampleIdx);
-    this.intervalId = setInterval(() => this.updateBoxInfo(), 1000);
-  }
+    if (startDate != null) {
+      const pTimestamp = Date.now() - timestampOffset;
+      const pLoopTime = loopTimeMinutes * 60 * 1000; // the loop time in milliseconds that deck gl displays
 
-  componentWillUnmount() {
-    clearInterval(this.intervalId);
-  }
+      let timeThroughLoop = (pTimestamp % pLoopTime);
+      let pPercentThroughLoop = Math.floor((timeThroughLoop / pLoopTime) * 100);
 
-  loadTrips(dataUrlIdx: number) {
-    let url = this.state.appConfig.dataSamples[dataUrlIdx].tripsUrl;
-    let _this: App = this;
+      // show time
+      let timeSinceStart = Math.floor(timeThroughLoop * (loopLength / pLoopTime));
+      let calculatedFriendlyTime = toFriendlyTime(timeSinceStart);
+
+      setFriendlyTime(calculatedFriendlyTime);
+      setPercentThroughLoop(pPercentThroughLoop);
+    }
+  }, [updateBoxInfoLoopToggle, timestampOffset, loopLength, loopTimeMinutes, startDate, timeMultiplier]);
+
+  const loadTrips = (dataUrlIdx: number) => {
+    let url = appConfig.dataSamples[dataUrlIdx].tripsUrl;
     fetch(url, {
         method: "GET",
         headers: {
@@ -90,32 +96,30 @@ export default class App extends React.Component<AppProps, AppState> {
     }).then(function (fetchResponse) {
         if (fetchResponse.status === 200) {
           fetchResponse.json().then((response: TripContainer) => {
-            let friendlyName = _this.state.appConfig.title;
+            let pFriendlyName = appConfig.title;
             if (response.friendlyName != null) {
-              friendlyName = response.friendlyName;
+              pFriendlyName = response.friendlyName;
             }
-            let startDate = Number(response.startTimestamp) 
+            let pStartDate = Number(response.startTimestamp) 
               ? new Date(response.startTimestamp as number * 1000)
               : new Date(Date.parse(response.startTimestamp as string));
-            let timeMultiplier = response.timeMultiplier;
-            let trips = response.trips;
-            let loopLength = response.loopLength;
+            let pTimeMultiplier = response.timeMultiplier;
+            let pTrips = response.trips;
+            let pLoopLength = response.loopLength;
 
             // allocate colours if there's a small number of trips
-            if (trips.length > 0 && trips.length <= 10) {
-              for (let i = 0; i < trips.length; i++) {
-                trips[i].color = _this.state.appConfig.colors[i % _this.state.appConfig.colors.length];
+            if (pTrips.length > 0 && pTrips.length <= 10) {
+              for (let i = 0; i < pTrips.length; i++) {
+                pTrips[i].color = appConfig.colors[i % appConfig.colors.length];
               }
             }
 
-            _this.timestampOffset = Date.now();
-            _this.setState({
-              friendlyName: friendlyName,
-              startDate: startDate,
-              trips: trips,
-              loopLength: loopLength,
-              timeMultiplier: timeMultiplier
-            });
+            setStartDate(pStartDate);
+            setTimestampOffset(Date.now());
+            setFriendlyName(pFriendlyName);
+            setTrips(pTrips);
+            setLoopLength(pLoopLength);
+            setTimeMultiplier(pTimeMultiplier);
           });
         } else {
           console.log('Sorry, something went wrong (' + fetchResponse.status + ')');
@@ -125,9 +129,8 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  loadNodeList(dataUrlIdx: number) {
-    let _this: App = this;
-    fetch(this.state.appConfig.dataSamples[dataUrlIdx].nodeListUrl, {
+  const loadNodeList = (dataUrlIdx: number) => {
+    fetch(appConfig.dataSamples[dataUrlIdx].nodeListUrl, {
       method: "GET",
       headers: {
           "Content-Type": "application/json; charset=utf-8",
@@ -137,9 +140,7 @@ export default class App extends React.Component<AppProps, AppState> {
         if (fetchResponse.status === 200) {
           fetchResponse.json().then((response: string[]) => {
             response.sort();
-            _this.setState({
-              nodeList: response
-            });
+            setNodeList(response);
           });
         } else {
           console.log('Sorry, something went wrong (' + fetchResponse.status + ')');
@@ -149,9 +150,8 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  loadGeoJsonNodes(dataUrlIdx: number) {
-    let _this: App = this;
-    fetch(this.state.appConfig.dataSamples[dataUrlIdx].geoJsonUrl, {
+  const loadGeoJsonNodes = (dataUrlIdx: number) => {
+    fetch(appConfig.dataSamples[dataUrlIdx].geoJsonUrl, {
       method: "GET",
       headers: {
           "Content-Type": "application/json; charset=utf-8",
@@ -160,9 +160,7 @@ export default class App extends React.Component<AppProps, AppState> {
     }).then(function (fetchResponse) {
         if (fetchResponse.status === 200) {
           fetchResponse.json().then((response: geojson.FeatureCollection<geojson.Point>) => {
-            _this.setState({
-              nodes: response
-            });
+            setNodes(response);
           });
         } else {
           console.log('Sorry, something went wrong (' + fetchResponse.status + ')');
@@ -173,249 +171,212 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   // the loop time in milliseconds that deck gl displays
-  getLoopTime() {
-    return this.state.loopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
+  const getLoopTime = () => {
+    return loopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
   }
 
-  updateBoxInfo() {
-    if (this.state.startDate != null) {
-      const timestamp = Date.now() - this.timestampOffset;
-      const loopTime = this.getLoopTime(); // the loop time in milliseconds that deck gl displays
-
-      let timeThroughLoop = (timestamp % loopTime);
-      let percentThroughLoop = Math.floor((timeThroughLoop / loopTime) * 100);
-
-      // show time
-      const startTime = 0 * 60 * 60 * this.state.timeMultiplier; // hourOfDay * seconds in hour
-      let timeSinceStart = startTime + Math.floor(timeThroughLoop * (this.state.loopLength / loopTime));
-      let calculatedFriendlyTime = this.toFriendlyTime(timeSinceStart);
-
-      this.setState({
-        friendlyTime: calculatedFriendlyTime,
-        percentThroughLoop: percentThroughLoop
-      });
-    }
-  }
-
-  toFriendlyTime(timeSinceStart: number) {
-      let realTimeSinceStart = timeSinceStart / this.state.timeMultiplier;
-      let currentDate = new Date(this.state.startDate.getTime() + realTimeSinceStart * 1000);
-      let minutes = String(currentDate.getMinutes());
-      if (minutes.length < 2) {
-        minutes = '0' + minutes;
-      }
-      return currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + minutes;
-  }
-
-  handleTimeChange(event: any) {
-    const timestamp = Date.now() - this.timestampOffset;
-    const loopTime = this.getLoopTime();
+  const handleTimeChange = (event: any) => {
+    const timestamp = Date.now() - timestampOffset;
+    const loopTime = getLoopTime();
     let timeThroughLoop = (timestamp % loopTime);
     let newPercentThroughLoop = event.target.value;
     let newTimeThroughLoop = (newPercentThroughLoop / 100) * loopTime;
-    let newTimestampOffset = this.timestampOffset + (timeThroughLoop - newTimeThroughLoop);
-    this.timestampOffset = newTimestampOffset;
+    let newTimestampOffset = timestampOffset + (timeThroughLoop - newTimeThroughLoop);
+    setTimestampOffset(newTimestampOffset);
   }
 
-  handleTrailLengthChange(event: any) {
+  const handleTrailLengthChange = (event: any) => {
     let trailLengthStr = event.target.value;
     if (trailLengthStr != null && trailLengthStr.length > 0) {
-      let trailLength = parseFloat(trailLengthStr);
-      if (trailLength <= 0) {
-        trailLength = 0.0001;
-      } else if (trailLength > 9999999) {
-        trailLength = 9999999;
+      let pTrailLength = parseFloat(trailLengthStr);
+      if (pTrailLength <= 0) {
+        pTrailLength = 0.0001;
+      } else if (pTrailLength > 9999999) {
+        pTrailLength = 9999999;
       }
-      this.setState({trailLength: trailLength});
-      this.knownUrlParams.trailLength = trailLength;
-      Utils.updateUrlParameters(this.knownUrlParams);
+      setTrailLength(pTrailLength);
+      knownUrlParams.trailLength = pTrailLength;
+      Utils.updateUrlParameters(knownUrlParams);
     } else {
-      this.setState({trailLength: this.state.appConfig.initialTrailLength});
-      this.knownUrlParams.trailLength = null;
-      Utils.updateUrlParameters(this.knownUrlParams);
+      setTrailLength(appConfig.initialTrailLength);
+      knownUrlParams.trailLength = null;
+      Utils.updateUrlParameters(knownUrlParams);
     }
   }
 
-  handleLoopTimeMinutesChange(event: any) {
+  const handleLoopTimeMinutesChange = (event: any) => {
     let loopTimeMinutesStr = event.target.value;
     if (loopTimeMinutesStr != null && loopTimeMinutesStr.length > 0) {
-      let loopTimeMinutes = parseFloat(loopTimeMinutesStr);
-      if (loopTimeMinutes <= 0) {
-        loopTimeMinutes = 0.0001;
-      } else if (loopTimeMinutes > 9999999) {
-        loopTimeMinutes = 9999999;
+      let pLoopTimeMinutes = parseFloat(loopTimeMinutesStr);
+      if (pLoopTimeMinutes <= 0) {
+        pLoopTimeMinutes = 0.0001;
+      } else if (pLoopTimeMinutes > 9999999) {
+        pLoopTimeMinutes = 9999999;
       }
-      const timestamp = Date.now() - this.timestampOffset;
-      const loopTime = this.getLoopTime(); // the loop time in milliseconds that deck gl displays
+      const timestamp = Date.now() - timestampOffset;
+      const loopTime = getLoopTime(); // the loop time in milliseconds that deck gl displays
   
-      let newLoopTime = loopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
+      let newLoopTime = pLoopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
   
       // Adjust the timestampOffset so that the new loop time kicks off at the same time as currently
-      let newTimestampOffset = this.timestampOffset 
+      let newTimestampOffset = timestampOffset 
         + ((timestamp % newLoopTime) - (newLoopTime * ((timestamp % loopTime) / loopTime)));
-      this.timestampOffset = newTimestampOffset;
+      setTimestampOffset(newTimestampOffset);
   
-      this.setState({
-        loopTimeMinutes: loopTimeMinutes
-      });
-      this.knownUrlParams.loopTime = loopTimeMinutes;
-      Utils.updateUrlParameters(this.knownUrlParams);
+      setLoopTimeMinutes(pLoopTimeMinutes);
+      knownUrlParams.loopTime = pLoopTimeMinutes;
+      Utils.updateUrlParameters(knownUrlParams);
     } else {
-      this.setState({loopTimeMinutes: this.state.appConfig.initialLoopTimeMinutes});
-      this.knownUrlParams.trailLength = null;
-      Utils.updateUrlParameters(this.knownUrlParams);
+      setLoopTimeMinutes(appConfig.initialLoopTimeMinutes);
+      knownUrlParams.trailLength = null;
+      Utils.updateUrlParameters(knownUrlParams);
     }
   }
 
-  handleHighlightNodeChange(highlightedNodesCommaSep: ValueType<any, any>) {
+  const handleHighlightNodeChange = (highlightedNodesCommaSep: ValueType<any, any>) => {
     if (highlightedNodesCommaSep == null) {
       highlightedNodesCommaSep = [];
     }
-    let highlightedNodes: string[] = highlightedNodesCommaSep.map((n: any) => n.value);
-    let highlightedNodesRemoved = this.state.highlightedNodes.length > highlightedNodes.length;
-    this.setState({highlightedNodes: highlightedNodes});
-    this.knownUrlParams.highlightedNodes = highlightedNodes;
-    Utils.updateUrlParameters(this.knownUrlParams);
+    let pHighlightedNodes: string[] = highlightedNodesCommaSep.map((n: any) => n.value);
+    let highlightedNodesRemoved = highlightedNodes.length > pHighlightedNodes.length;
+    setHighlightedNodes(pHighlightedNodes);
+    knownUrlParams.highlightedNodes = pHighlightedNodes;
+    Utils.updateUrlParameters(knownUrlParams);
     if (highlightedNodesRemoved) {
-      this.handleHighlightNodeReload();
+      handleHighlightNodeReload();
     }
   }
 
-  handleHighlightNodeReload() {
+  const handleHighlightNodeReload = () => {
     // create a new array for trips so the colours are updated
-    this.setState({trips: Object.assign([], this.state.trips)});
+    setTrips(Object.assign([], trips));
   }
 
-  handleDataChange(dataSampleOption: ValueType<any, any>) {    
-    if (dataSampleOption != null && this.state.dataSampleIdx !== dataSampleOption.value) {
-      this.handleHighlightNodeChange([]);
-      let dataSampleIdx = dataSampleOption.value as number;
+  const handleDataChange = (dataSampleOption: ValueType<any, any>) => {    
+    if (dataSampleOption != null && dataSampleIdx !== dataSampleOption.value) {
+      handleHighlightNodeChange([]);
+      let pDataSampleIdx = dataSampleOption.value as number;
       window.history.pushState({}, '', '')
-      this.setState({trips: null, dataSampleIdx: dataSampleIdx});
-      this.loadTrips(dataSampleIdx);
-      this.loadNodeList(dataSampleIdx);
-      this.loadGeoJsonNodes(dataSampleIdx);
-      this.handleViewportChange(this.state.appConfig.dataSamples[dataSampleIdx].initialPartialViewport);
-      this.knownUrlParams.dataSampleIdx = dataSampleIdx;
-      Utils.updateUrlParameters(this.knownUrlParams);
+      setTrips(null);
+      setDataSampleIdx(pDataSampleIdx);
+      loadTrips(pDataSampleIdx);
+      loadNodeList(pDataSampleIdx);
+      loadGeoJsonNodes(pDataSampleIdx);
+      handleViewportChange(appConfig.dataSamples[pDataSampleIdx].initialPartialViewport);
+      knownUrlParams.dataSampleIdx = pDataSampleIdx;
+      Utils.updateUrlParameters(knownUrlParams);
     }
   }
 
-  handleOnHoverGeoPoint(info: any) {
-    this.setState({popupInfo: info !== null ? info.object : null});
+  const handleOnHoverGeoPoint = (info: any) => {
+    setPopupInfo(info !== null ? info.object : null);
   }
 
-  resize() {
-    this.handleViewportChange({
+  const resize = () => {
+    handleViewportChange({
       width: window.innerWidth,
       height: window.innerHeight
     });
   }
 
-  handleViewportChange(viewport: any) {
-    this.setState({
-      viewport: Object.assign({}, this.state.viewport, viewport)
-    });
+  const handleViewportChange = (pViewport: any) => {
+    setViewport(Object.assign({}, viewport, pViewport));
   }
 
-  handleInfoBoxVisibility(hideInfoBox: boolean) {
-    this.setState({
-      hideInfoBox: hideInfoBox
-    });
+  const handleInfoBoxVisibility = (pHideInfoBox: boolean) => {
+    setHideInfoBox(pHideInfoBox);
   }
 
-  render() {
-    const {appConfig, dataSampleIdx, friendlyName, friendlyTime, hideInfoBox, highlightedNodes, loopLength, loopTimeMinutes, nodeList, nodes, percentThroughLoop, popupInfo, trailLength, trips, viewport} = this.state;
+  const dataSampleOptions: any[] = appConfig.dataSamples.map((n: DataSampleUrls, idx: number) => { return { "value": idx, "label": n.title} });
+  const nodeListOptions: any[] = nodeList.map(n => { return { "value": n, "label": n} });
+  const highlightedNodesVl: any[] = highlightedNodes.map(n => { return { "value": n, "label": n} });
 
-    const dataSampleOptions: any[] = this.state.appConfig.dataSamples.map((n: DataSampleUrls, idx: number) => { return { "value": idx, "label": n.title} });
-    const nodeListOptions: any[] = nodeList.map(n => { return { "value": n, "label": n} });
-    const highlightedNodesVl: any[] = highlightedNodes.map(n => { return { "value": n, "label": n} });
+  let loader = <span></span>;
+  if (trips == null) {
+    loader = <Loader />;
+  }
 
-    let loader = <span></span>;
-    if (trips == null) {
-      loader = <Loader />;
-    }
+  let popupEle = null;
+  if (popupInfo != null) {
+    popupEle =
+      <Popup longitude={popupInfo.geometry.coordinates[0]} latitude={popupInfo.geometry.coordinates[1]} closeButton={false} closeOnClick={false} anchor="bottom-left">
+        <div className="popup-inner">{appConfig.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
+      </Popup>;
+  }
 
-    let popupEle = null;
-    if (popupInfo != null) {
-      popupEle =
-        <Popup longitude={popupInfo.geometry.coordinates[0]} latitude={popupInfo.geometry.coordinates[1]} closeButton={false} closeOnClick={false} anchor="bottom-left">
-          <div className="popup-inner">{this.state.appConfig.nodeLabel} {popupInfo.properties != null ? popupInfo.properties.name : ''}</div>
-        </Popup>;
-    }
+  let selectDataEle = null;
+  if (appConfig.dataSamples.length > 1) {
+    selectDataEle = <div><h6>Select Data</h6><div><Select options={dataSampleOptions} onChange={handleDataChange} value={dataSampleOptions[dataSampleIdx]} /></div></div>;
+  }
 
-    let selectDataEle = null;
-    if (this.state.appConfig.dataSamples.length > 1) {
-      selectDataEle = <div><h6>Select Data</h6><div><Select options={dataSampleOptions} onChange={this.handleDataChange} value={dataSampleOptions[dataSampleIdx]} /></div></div>;
-    }
-
-    return (
-      <div id="container">
-        {loader}
-        <div id="divdeckgl">
-          <ReactMapGL 
-            {...viewport}
-            mapStyle={this.state.appConfig.mapboxStyle}
-            dragRotate={true}
-            onViewportChange={this.handleViewportChange.bind(this)}
-            mapboxApiAccessToken={this.state.appConfig.mapboxToken}>
-            <DeckGLOverlay 
-              color={appConfig.color}
-              handleOnHover={this.handleOnHoverGeoPoint}
-              highlightColor={appConfig.highlightColor}
-              highlightedNodes={highlightedNodes}
-              initialViewState={appConfig.initialViewport}
-              loopLength={loopLength}
-              loopTimeMilliseconds={this.getLoopTime()}
-              nodes={nodes!}
-              timestampOffset={this.timestampOffset}
-              trips={trips}
-              trailLength={trailLength}
-              viewport={viewport}
-              />
-            {popupEle}
-          </ReactMapGL>
-        </div>
-        <div id="top-left-container">
-          <div id="title-box"><h1>{friendlyName}</h1></div>
-          <div id="divinfo" className={hideInfoBox ? "hide" : ""}>
-            <button id="btnHideInfoBox" className="btn-transparent right-align" onClick={() => this.handleInfoBoxVisibility(true)}>X</button>
-            {selectDataEle}
-            <h3>{friendlyTime}</h3>
-            <div>
-              <h6>Adjust point in time</h6>
-              <input className="full-width" type="range" min="0" max="100" value={String(percentThroughLoop)} onChange={this.handleTimeChange} />
-            </div>
-            <div>
-              <h6>Adjust loop time</h6>
-              <div className="block">
-                <input className="" type="number" defaultValue={String(loopTimeMinutes)} onInput={this.handleLoopTimeMinutesChange} /><label>mins</label>
-              </div>
-            </div>
-            <div>
-              <h6>Adjust trail length</h6>
-              <div className="block">
-                <input type="number" defaultValue={String(trailLength)} onInput={this.handleTrailLengthChange} /><label>x</label>
-              </div>
-            </div>
-            <div>
-              <h6>Highlight {this.state.appConfig.nodeLabelPlural}</h6>
-              <div>
-                <Select
-                  closeMenuOnSelect={false}
-                  isMulti
-                  options={nodeListOptions}
-                  onChange={this.handleHighlightNodeChange}
-                  onMenuClose={this.handleHighlightNodeReload}
-                  placeholder={"Highlight " + this.state.appConfig.nodeLabelPlural}
-                  value={highlightedNodesVl}
-                />
-              </div>
+  return (
+    <div id="container">
+      {loader}
+      <div id="divdeckgl">
+        <ReactMapGL 
+          {...viewport}
+          mapStyle={appConfig.mapboxStyle}
+          dragRotate={true}
+          onViewportChange={handleViewportChange}
+          mapboxApiAccessToken={appConfig.mapboxToken}>
+          <DeckGLOverlay 
+            color={appConfig.color}
+            handleOnHover={handleOnHoverGeoPoint}
+            highlightColor={appConfig.highlightColor}
+            highlightedNodes={highlightedNodes}
+            initialViewState={appConfig.initialViewport}
+            loopLength={loopLength}
+            loopTimeMinutes={loopTimeMinutes}
+            nodes={nodes!}
+            timestampOffset={timestampOffset}
+            trips={trips}
+            trailLength={trailLength}
+            viewport={viewport}
+            />
+          {popupEle}
+        </ReactMapGL>
+      </div>
+      <div id="top-left-container">
+        <div id="title-box"><h1>{friendlyName}</h1></div>
+        <div id="divinfo" className={hideInfoBox ? "hide" : ""}>
+          <button id="btnHideInfoBox" className="btn-transparent right-align" onClick={() => handleInfoBoxVisibility(true)}>X</button>
+          {selectDataEle}
+          <h3>{friendlyTime}</h3>
+          <div>
+            <h6>Adjust point in time</h6>
+            <input className="full-width" type="range" min="0" max="100" value={String(percentThroughLoop)} onChange={handleTimeChange} />
+          </div>
+          <div>
+            <h6>Adjust loop time</h6>
+            <div className="block">
+              <input className="" type="number" defaultValue={String(loopTimeMinutes)} onInput={handleLoopTimeMinutesChange} /><label>mins</label>
             </div>
           </div>
-          <button id="btnShowInfoBox" className={"btn-transparent " + (hideInfoBox ? "" : "hide")} onClick={() => this.handleInfoBoxVisibility(false)}>SHOW INFO BOX</button>
+          <div>
+            <h6>Adjust trail length</h6>
+            <div className="block">
+              <input type="number" defaultValue={String(trailLength)} onInput={handleTrailLengthChange} /><label>x</label>
+            </div>
+          </div>
+          <div>
+            <h6>Highlight {appConfig.nodeLabelPlural}</h6>
+            <div>
+              <Select
+                closeMenuOnSelect={false}
+                isMulti
+                options={nodeListOptions}
+                onChange={handleHighlightNodeChange}
+                onMenuClose={handleHighlightNodeReload}
+                placeholder={"Highlight " + appConfig.nodeLabelPlural}
+                value={highlightedNodesVl}
+              />
+            </div>
+          </div>
         </div>
+        <button id="btnShowInfoBox" className={"btn-transparent " + (hideInfoBox ? "" : "hide")} onClick={() => handleInfoBoxVisibility(false)}>SHOW INFO BOX</button>
       </div>
-    );
-  }
+    </div>
+  );
 }
+
+export default App;
