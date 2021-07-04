@@ -1,59 +1,39 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl';
-import {DeckglOverlayProps, Trip, DeckflOverlayState, Waypoint} from './data-interfaces';
+import {DeckglOverlayProps, Trip, Waypoint} from './data-interfaces';
 import { RGBAColor, Position } from '@deck.gl/core';
 
-export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, DeckflOverlayState> {
+const DeckGLOverlay = (props: DeckglOverlayProps) => {
 
-  animationFrame: number | null;
+  const [currentTime, setCurrentTime] = useState(0);
+  const [animation] = useState({id:0});
 
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      currentTime: 0
-    };
-
-    this.animationFrame = null;
-
-    this.animate = this.animate.bind(this);
-    this.getColor = this.getColor.bind(this);
-  }
-
-  componentDidMount() {
-    this.animate();
-  }
-
-  componentWillUnmount() {
-    if (this.animationFrame != null) {
-      window.cancelAnimationFrame(this.animationFrame);
+  useEffect(() => {
+    const animate = () => {
+      if (props.loopLength != null) {
+        const timestamp = Date.now() - props.timestampOffset;
+        const loopTime = props.loopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
+        setCurrentTime((timestamp % loopTime) * (props.loopLength / loopTime));
+      }
+      animation.id = window.requestAnimationFrame(animate);
     }
-  }
 
-  animate() {
-    if (this.props.loopLength != null) {
-      const timestamp = Date.now() - this.props.timestampOffset;
-      const loopTime = this.props.loopTimeMilliseconds; // the loop time in milliseconds that deck gl displays
-      this.setState({
-        currentTime: (timestamp % loopTime) * (this.props.loopLength / loopTime)
-      });
-    }
-    this.animationFrame = window.requestAnimationFrame(this.animate.bind(this));
-  }
-  
-  getColor(d: Trip) {
-    let color = this.props.color;
+    animation.id = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(animation.id);
+  }, [animation, props.loopLength, props.timestampOffset, props.loopTimeMinutes]);
+
+  const getColor = (d: Trip) => {
+    let color = props.color;
     const tagColor = d.color;
     if (tagColor != null) {
       color = tagColor;
     }
 
     if (d.nodes != null) {
-      if (this.props.highlightedNodes.length > 0) {
-        let self = this;
+      if (props.highlightedNodes.length > 0) {
         d.nodes.forEach((n: string) => {
-          if (self.props.highlightedNodes.find((hn: string) => n.toLowerCase() === hn.toLowerCase()) != null) {
-            color = this.props.highlightColor;
+          if (props.highlightedNodes.find((hn: string) => n.toLowerCase() === hn.toLowerCase()) != null) {
+            color = props.highlightColor;
           }
         });
       }
@@ -62,54 +42,51 @@ export default class DeckGLOverlay extends React.Component<DeckglOverlayProps, D
     return color as RGBAColor;
   }
 
-  render() {
-    const {handleOnHover, initialViewState, nodes, trips, trailLength, viewport} = this.props;
-    const {currentTime} = this.state;
-
-    let layers = [];
-    
-    if (trips != null) {
-      layers.push(new TripsLayer({
-        id: 'trips',
-        data: trips,
-        getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates as Position),
-        getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
-        getColor: this.getColor,
-        opacity: 0.3,
-        widthMinPixels: 2,
-        trailLength,
-        currentTime
-      }));
-    }
-
-    if (nodes != null) {
-      layers.push(new GeoJsonLayer({
-        id: 'geojson-layer',
-        data: nodes,
-        filled: true,
-        getFillColor: () => [0, 255, 178, 150],
-        stroked: true,
-        extruded: false,
-        pointRadiusScale: 100,
-        getRadius: () => 0.4,
-        pickable: true,
-        autoHighlight: true,
-        highlightColor: [0, 255, 178, 250],
-        onHover: handleOnHover,
-        onClick: (info: any) => console.log(info.object.properties.name)
-      }));
-    }
-
-    if (layers.length === 0) {
-      return null;
-    }
-
-    return (
-      <DeckGL
-        initialViewState={initialViewState}
-        viewState={viewport}
-        layers={layers}
-      />
-    );
+  let layers = [];
+  
+  if (props.trips != null) {
+    layers.push(new TripsLayer({
+      id: 'trips',
+      data: props.trips,
+      getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates as Position),
+      getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
+      getColor: getColor,
+      opacity: 0.3,
+      widthMinPixels: 2,
+      trailLength: props.trailLength,
+      currentTime
+    }));
   }
+
+  if (props.nodes != null) {
+    layers.push(new GeoJsonLayer({
+      id: 'geojson-layer',
+      data: props.nodes,
+      filled: true,
+      getFillColor: () => [0, 255, 178, 150],
+      stroked: true,
+      extruded: false,
+      pointRadiusScale: 100,
+      getRadius: () => 0.4,
+      pickable: true,
+      autoHighlight: true,
+      highlightColor: [0, 255, 178, 250],
+      onHover: props.handleOnHover,
+      onClick: (info: any) => console.log(info.object.properties.name)
+    }));
+  }
+
+  if (layers.length === 0) {
+    return null;
+  }
+
+  return (
+    <DeckGL
+      initialViewState={props.initialViewState}
+      viewState={props.viewport}
+      layers={layers}
+    />
+  );
 }
+
+export default DeckGLOverlay;
