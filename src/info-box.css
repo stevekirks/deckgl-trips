@@ -1,0 +1,222 @@
+#top-left-container {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#title-box {
+  margin: 20px;
+  color: white;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  z-index: 30;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 5px;
+}
+#divinfo {
+  position: relative;
+  color: black;
+  background-color: white;
+  border-radius: 1px;
+  /* font-size: 25px; */
+  margin: 20px;
+  padding: 20px;
+  width: 200px;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+#divinfo h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
+#divinfo h6 {
+  font-size: 15px;
+}
+.full-width {
+  width: 100%;
+}
+
+
+/*All just for the input range*/
+input[type="range"] {
+  height: 26px;
+  -webkit-appearance: none;
+  margin: 0;
+  width: 100%;
+}
+input[type="range"]:focus {
+  outline: none;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 14px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #50555c;
+  background: #50555c;
+  border-radius: 14px;
+  border: 0px solid #000000;
+}
+input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px #000000;
+  border: 0px solid #000000;
+  height: 20px;
+  width: 30px;
+  border-radius: 12px;
+  background: rgb(23, 184, 190);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -3px;
+}
+input[type="range"]:focus::-webkit-slider-runnable-track {
+  background: #50555c;
+}
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 14px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #50555c;
+  background: #50555c;
+  border-radius: 14px;
+  border: 0px solid #000000;
+}
+input[type="range"]::-moz-range-thumb {
+  box-shadow: 0px 0px 0px #000000;
+  border: 0px solid #000000;
+  height: 20px;
+  width: 30px;
+  border-radius: 12px;
+  background: rgb(23, 184, 190);
+  cursor: pointer;
+}
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 14px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type="range"]::-ms-fill-lower {
+  background: #50555c;
+  border: 0px solid #000000;
+  border-radius: 28px;
+  box-shadow: 1px 1px 1px #50555c;
+}
+input[type="range"]::-ms-fill-upper {
+  background: #50555c;
+  border: 0px solid #000000;
+  border-radius: 28px;
+  box-shadow: 1px 1px 1px #50555c;
+}
+input[type="range"]::-ms-thumb {
+  margin-top: 1px;
+  box-shadow: 0px 0px 0px #000000;
+  border: 0px solid #000000;
+  height: 20px;
+  width: 30px;
+  border-radius: 12px;
+  background: rgb(23, 184, 190);
+  cursor: pointer;
+}
+input[type="range"]:focus::-ms-fill-lower {
+  background: #50555c;
+}
+input[type="range"]:focus::-ms-fill-upper {
+  background: #50555c;
+}
+/*End of All just for the input range*/
+
+/* Button */
+button {
+  padding: 8px;
+  background-color: rgb(23, 184, 190);
+  border: 0 none;
+  border-radius: 2px;
+  font-size: 15px;
+  color: white;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: rgb(15, 101, 104);
+}
+
+button:active,
+.btn-highlight {
+  background-color: rgb(253, 128, 93);
+}
+
+/* Input number */
+input[type="number"],
+input[type="text"] {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid black;
+  text-align: right;
+  font-size: 25px;
+  width: 100px;
+  position: relative;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  border-bottom: 3px solid rgb(23, 184, 190);
+}
+
+.float-right {
+  float: right;
+}
+
+.block {
+  margin-left: 40px;
+}
+
+.block label {
+  display: inline-block;
+  font-size: 15px;
+}
+
+.btn-day {
+  padding: 1px 3px;
+  margin: 1px;
+}
+
+.popup-inner {
+  color: black;
+}
+
+.hide {
+  display: none;
+}
+
+#btnHideInfoBox {
+  padding: 2px 5px 2px 5px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: 1px solid grey;
+  overflow: hidden;
+  outline: none;
+  font-size: 10px;
+  color: black;
+  float: right;
+}
+
+#btnShowInfoBox {
+  margin-left: 20px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: 1px solid grey;
+  overflow: hidden;
+  outline: none;
+  font-size: 10px;
+}
