@@ -1,4 +1,5 @@
 import * as geojson from 'geojson';
+import React from 'react';
 
 
 export interface AppConfig {
@@ -37,6 +38,38 @@ export interface DataSampleUrls {
     geoJsonUrl: string,
     nodeListUrl: string,
     initialPartialViewport: PartialViewport
+}
+
+export interface InfoBoxProps {
+    appConfig: AppConfig,
+
+    dataSampleIdx: number,
+
+    handleDataChange: (pDataSampleIdx: number) => void,
+
+    friendlyName: string,
+
+    highlightedNodes: string[],
+    setHighlightedNodes: React.Dispatch<React.SetStateAction<string[]>>,
+
+    loopLength: number,
+
+    loopTimeMinutes: number,
+    setLoopTimeMinutes: React.Dispatch<React.SetStateAction<number>>,
+
+    nodeList: string[],
+
+    startDate: Date,
+
+    timestampOffset: number,
+    setTimestampOffset: React.Dispatch<React.SetStateAction<number>>,
+
+    timeMultiplier: number,
+
+    trailLength: number,
+    setTrailLength: React.Dispatch<React.SetStateAction<number>>
+
+    reloadTrips: () => void;
 }
 
 export interface KnownUrlParameters {
