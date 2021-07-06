@@ -17,7 +17,7 @@ jobs:
       - name: Install and Build
         env:
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
-          REACT_APP_MAPBOX_STYLE: mapbox://styles/stevejk/ckewepbut0ofs19obaw54z2lg
+          REACT_APP_MAPBOX_STYLE: ${{ secrets.REACT_APP_MAPBOX_STYLE }}
           REACT_APP_DATA_BASE_URL: data
         run: |
           npm install
