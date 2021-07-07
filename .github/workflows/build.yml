@@ -1,0 +1,21 @@
+name: CD
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
+
+      - name: Test
+        run: npm run test
