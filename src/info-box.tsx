@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import {KnownUrlParameters, DataSampleUrls, InfoBoxProps} from './data-interfaces';
-import * as Utils from './utils';
+import { DataSampleUrls, InfoBoxProps} from './data-interfaces';
 import Select from 'react-select';
 import './info-box.css';
 import './select.css';
 import { ValueType } from 'react-select/src/types';
+import { useCallback } from 'react';
 
 const InfoBox = (props: InfoBoxProps) => {
 
-  let knownUrlParams: KnownUrlParameters = Utils.getKnownUrlParameters();
+  const {handleLoopTimeMinutes, handleTimestampOffset, handleTrailLength, handleDataChange, handleHighlightedNodes, reloadTrips} = props;
 
   const [friendlyTime, setFriendlyTime] = useState('');
   const [hideInfoBox, setHideInfoBox] = useState(false);
@@ -16,7 +16,7 @@ const InfoBox = (props: InfoBoxProps) => {
   const [updateBoxInfoLoopToggle, setUpdateBoxInfoLoopToggle] = useState(false);
 
   useEffect(() => {
-    const intervalId = setInterval(() => setUpdateBoxInfoLoopToggle(updateBoxInfoLoopToggle => !updateBoxInfoLoopToggle), 1000);
+    const intervalId = setInterval(() => setUpdateBoxInfoLoopToggle(updateBoxInfoLoopToggle => !updateBoxInfoLoopToggle), 1000000);
     return () => {
       clearInterval(intervalId);
     };
@@ -53,21 +53,21 @@ const InfoBox = (props: InfoBoxProps) => {
   }, [updateBoxInfoLoopToggle, props.timestampOffset, props.loopLength, props.loopTimeMinutes, props.startDate, props.timeMultiplier]);
 
   // the loop time in milliseconds that deck gl displays
-  const getLoopTime = () => {
+  const getLoopTime = useCallback(() => {
     return props.loopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
-  }
+  }, [props.loopTimeMinutes]);
 
-  const handleTimeChange = (event: any) => {
+  const handleTimeChange = useCallback((event: any) => {
     const timestamp = Date.now() - props.timestampOffset;
     const loopTime = getLoopTime();
     let timeThroughLoop = (timestamp % loopTime);
     let newPercentThroughLoop = event.target.value;
     let newTimeThroughLoop = (newPercentThroughLoop / 100) * loopTime;
     let newTimestampOffset = props.timestampOffset + (timeThroughLoop - newTimeThroughLoop);
-    props.setTimestampOffset(newTimestampOffset);
-  }
+    handleTimestampOffset(newTimestampOffset);
+  }, [getLoopTime, props.timestampOffset, handleTimestampOffset]);
 
-  const handleTrailLengthChange = (event: any) => {
+  const handleTrailLengthChange = useCallback((event: any) => {
     let trailLengthStr = event.target.value;
     if (trailLengthStr != null && trailLengthStr.length > 0) {
       let pTrailLength = parseFloat(trailLengthStr);
@@ -76,17 +76,13 @@ const InfoBox = (props: InfoBoxProps) => {
       } else if (pTrailLength > 9999999) {
         pTrailLength = 9999999;
       }
-      props.setTrailLength(pTrailLength);
-      knownUrlParams.trailLength = pTrailLength;
-      Utils.updateUrlParameters(knownUrlParams);
+      handleTrailLength(pTrailLength);
     } else {
-      props.setTrailLength(props.appConfig.initialTrailLength);
-      knownUrlParams.trailLength = null;
-      Utils.updateUrlParameters(knownUrlParams);
+      handleTrailLength(props.appConfig.initialTrailLength);
     }
-  }
+  }, [handleTrailLength, props.appConfig.initialTrailLength]);
 
-  const handleLoopTimeMinutesChange = (event: any) => {
+  const handleLoopTimeMinutesChange = useCallback((event: any) => {
     let loopTimeMinutesStr = event.target.value;
     if (loopTimeMinutesStr != null && loopTimeMinutesStr.length > 0) {
       let pLoopTimeMinutes = parseFloat(loopTimeMinutesStr);
@@ -103,38 +99,32 @@ const InfoBox = (props: InfoBoxProps) => {
       // Adjust the timestampOffset so that the new loop time kicks off at the same time as currently
       let newTimestampOffset = props.timestampOffset 
         + ((timestamp % newLoopTime) - (newLoopTime * ((timestamp % loopTime) / loopTime)));
-      props.setTimestampOffset(newTimestampOffset);
+      handleTimestampOffset(newTimestampOffset);
   
-      props.setLoopTimeMinutes(pLoopTimeMinutes);
-      knownUrlParams.loopTime = pLoopTimeMinutes;
-      Utils.updateUrlParameters(knownUrlParams);
+      handleLoopTimeMinutes(pLoopTimeMinutes);
     } else {
-      props.setLoopTimeMinutes(props.appConfig.initialLoopTimeMinutes);
-      knownUrlParams.trailLength = null;
-      Utils.updateUrlParameters(knownUrlParams);
+      handleLoopTimeMinutes(props.appConfig.initialLoopTimeMinutes);
     }
-  }
+  }, [getLoopTime, handleTimestampOffset, handleLoopTimeMinutes, props.timestampOffset, props.appConfig.initialLoopTimeMinutes]);
 
-  const handleDataSelectChange = (dataSampleOption: ValueType<any, any>) => {    
-    if (dataSampleOption != null) {
-      handleHighlightNodeChange([]);
-      props.handleDataChange(dataSampleOption.value as number);
-    }
-  }
-
-  const handleHighlightNodeChange = (highlightedNodesCommaSep: ValueType<any, any>) => {
+  const handleHighlightNodeChange = useCallback((highlightedNodesCommaSep: ValueType<any, any>) => {
     if (highlightedNodesCommaSep == null) {
       highlightedNodesCommaSep = [];
     }
     let pHighlightedNodes: string[] = highlightedNodesCommaSep.map((n: any) => n.value);
     let highlightedNodesRemoved = props.highlightedNodes.length > pHighlightedNodes.length;
-    props.setHighlightedNodes(pHighlightedNodes);
-    knownUrlParams.highlightedNodes = pHighlightedNodes;
-    Utils.updateUrlParameters(knownUrlParams);
+    handleHighlightedNodes(pHighlightedNodes);
     if (highlightedNodesRemoved) {
-      props.reloadTrips();
+      reloadTrips();
     }
-  }
+  }, [handleHighlightedNodes, reloadTrips, props.highlightedNodes]);
+
+  const handleDataSelectChange = useCallback((dataSampleOption: ValueType<any, any>) => {    
+    if (dataSampleOption != null) {
+      handleHighlightNodeChange([]);
+      handleDataChange(dataSampleOption.value as number);
+    }
+  }, [handleHighlightNodeChange, handleDataChange]);
 
   const handleInfoBoxVisibility = (pHideInfoBox: boolean) => {
     setHideInfoBox(pHideInfoBox);
@@ -163,13 +153,13 @@ const InfoBox = (props: InfoBoxProps) => {
         <div>
           <h6>Adjust loop time</h6>
           <div className="block">
-            <input className="" type="number" defaultValue={String(props.loopTimeMinutes)} onInput={handleLoopTimeMinutesChange} /><label>mins</label>
+            <input className="" type="number" value={String(props.loopTimeMinutes)} onInput={handleLoopTimeMinutesChange} /><label>mins</label>
           </div>
         </div>
         <div>
           <h6>Adjust trail length</h6>
           <div className="block">
-            <input type="number" defaultValue={String(props.trailLength)} onInput={handleTrailLengthChange} /><label>x</label>
+            <input type="number" value={String(props.trailLength)} onInput={handleTrailLengthChange} /><label>x</label>
           </div>
         </div>
         <div>

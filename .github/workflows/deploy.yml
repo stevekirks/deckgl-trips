@@ -17,11 +17,15 @@ jobs:
       - name: Install and Build
         env:
           REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
-          REACT_APP_MAPBOX_STYLE: ${{ secrets.REACT_APP_MAPBOX_STYLE }}
-          REACT_APP_DATA_BASE_URL: data
         run: |
           npm install
           npm run build
+
+      - uses: microsoft/variable-substitution@v1 
+        with:
+          files: 'build/app-settings.json'
+        env:
+          mapboxStyle: ${{ secrets.REACT_APP_MAPBOX_STYLE }}
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
