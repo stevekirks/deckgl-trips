@@ -18,6 +18,9 @@ jobs:
         run: |
           npm install
           npm run build
+          
+      - name: Test
+        run: npm run test
 
       - uses: microsoft/variable-substitution@v1 
         with:
