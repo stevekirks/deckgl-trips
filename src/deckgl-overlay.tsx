@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl';
 import {DeckglOverlayProps, Trip, Waypoint} from './data-interfaces';
 import { RGBAColor, Position } from '@deck.gl/core';
-import { useCallback } from 'react';
 
 const DeckGLOverlay = (props: DeckglOverlayProps) => {
 
@@ -23,7 +22,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     return () => window.cancelAnimationFrame(animation.id);
   }, [animation, props.loopLength, props.timestampOffset, props.loopTimeMinutes]);
 
-  const getColor = useCallback((d: Trip) => {
+  const getColor = (d: Trip) => {
     let color = props.color;
     const tagColor = d.color;
     if (tagColor != null) {
@@ -41,7 +40,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     }
 
     return color as RGBAColor;
-  }, [props.color, props.highlightColor, props.highlightedNodes]);
+  }
 
   let layers = [];
   
