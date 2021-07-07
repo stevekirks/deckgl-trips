@@ -4,7 +4,6 @@ import Select from 'react-select';
 import './info-box.css';
 import './select.css';
 import { ValueType } from 'react-select/src/types';
-import { useCallback } from 'react';
 
 const InfoBox = (props: InfoBoxProps) => {
 
@@ -16,7 +15,7 @@ const InfoBox = (props: InfoBoxProps) => {
   const [updateBoxInfoLoopToggle, setUpdateBoxInfoLoopToggle] = useState(false);
 
   useEffect(() => {
-    const intervalId = setInterval(() => setUpdateBoxInfoLoopToggle(updateBoxInfoLoopToggle => !updateBoxInfoLoopToggle), 1000000);
+    const intervalId = setInterval(() => setUpdateBoxInfoLoopToggle(updateBoxInfoLoopToggle => !updateBoxInfoLoopToggle), 1000);
     return () => {
       clearInterval(intervalId);
     };
@@ -53,11 +52,11 @@ const InfoBox = (props: InfoBoxProps) => {
   }, [updateBoxInfoLoopToggle, props.timestampOffset, props.loopLength, props.loopTimeMinutes, props.startDate, props.timeMultiplier]);
 
   // the loop time in milliseconds that deck gl displays
-  const getLoopTime = useCallback(() => {
+  const getLoopTime = () => {
     return props.loopTimeMinutes * 60 * 1000; // in x * 1000, x is in seconds
-  }, [props.loopTimeMinutes]);
+  }
 
-  const handleTimeChange = useCallback((event: any) => {
+  const handleTimeChange = (event: any) => {
     const timestamp = Date.now() - props.timestampOffset;
     const loopTime = getLoopTime();
     let timeThroughLoop = (timestamp % loopTime);
@@ -65,9 +64,9 @@ const InfoBox = (props: InfoBoxProps) => {
     let newTimeThroughLoop = (newPercentThroughLoop / 100) * loopTime;
     let newTimestampOffset = props.timestampOffset + (timeThroughLoop - newTimeThroughLoop);
     handleTimestampOffset(newTimestampOffset);
-  }, [getLoopTime, props.timestampOffset, handleTimestampOffset]);
+  }
 
-  const handleTrailLengthChange = useCallback((event: any) => {
+  const handleTrailLengthChange = (event: any) => {
     let trailLengthStr = event.target.value;
     if (trailLengthStr != null && trailLengthStr.length > 0) {
       let pTrailLength = parseFloat(trailLengthStr);
@@ -80,9 +79,9 @@ const InfoBox = (props: InfoBoxProps) => {
     } else {
       handleTrailLength(props.appConfig.initialTrailLength);
     }
-  }, [handleTrailLength, props.appConfig.initialTrailLength]);
+  }
 
-  const handleLoopTimeMinutesChange = useCallback((event: any) => {
+  const handleLoopTimeMinutesChange = (event: any) => {
     let loopTimeMinutesStr = event.target.value;
     if (loopTimeMinutesStr != null && loopTimeMinutesStr.length > 0) {
       let pLoopTimeMinutes = parseFloat(loopTimeMinutesStr);
@@ -105,9 +104,9 @@ const InfoBox = (props: InfoBoxProps) => {
     } else {
       handleLoopTimeMinutes(props.appConfig.initialLoopTimeMinutes);
     }
-  }, [getLoopTime, handleTimestampOffset, handleLoopTimeMinutes, props.timestampOffset, props.appConfig.initialLoopTimeMinutes]);
+  }
 
-  const handleHighlightNodeChange = useCallback((highlightedNodesCommaSep: ValueType<any, any>) => {
+  const handleHighlightNodeChange = (highlightedNodesCommaSep: ValueType<any, any>) => {
     if (highlightedNodesCommaSep == null) {
       highlightedNodesCommaSep = [];
     }
@@ -117,14 +116,14 @@ const InfoBox = (props: InfoBoxProps) => {
     if (highlightedNodesRemoved) {
       reloadTrips();
     }
-  }, [handleHighlightedNodes, reloadTrips, props.highlightedNodes]);
+  }
 
-  const handleDataSelectChange = useCallback((dataSampleOption: ValueType<any, any>) => {    
+  const handleDataSelectChange = (dataSampleOption: ValueType<any, any>) => {    
     if (dataSampleOption != null) {
       handleHighlightNodeChange([]);
       handleDataChange(dataSampleOption.value as number);
     }
-  }, [handleHighlightNodeChange, handleDataChange]);
+  }
 
   const handleInfoBoxVisibility = (pHideInfoBox: boolean) => {
     setHideInfoBox(pHideInfoBox);
