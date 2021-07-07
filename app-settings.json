@@ -1,0 +1,74 @@
+{
+    "color": [
+        23,
+        184,
+        190
+    ],
+    "colors": [
+        [
+            0,
+            255,
+            246
+        ],
+        [
+            255,
+            235,
+            86
+        ],
+        [
+            255,
+            109,
+            245
+        ],
+        [
+            0,
+            255,
+            119
+        ]
+    ],
+    "dataSamples": [
+        {
+            "title": "SE QLD Transport",
+            "tripsUrl": "/data/south-east-qld/trips.json",
+            "geoJsonUrl": "/data/south-east-qld/geojson-stops.json",
+            "nodeListUrl": "/data/south-east-qld/stops-list.json",
+            "initialPartialViewport": {
+                "latitude": -27.44,
+                "longitude": 153.05,
+                "zoom": 11
+            }
+        },
+        {
+            "title": "SC Transport",
+            "tripsUrl": "/data/sunshine-coast/trips.json",
+            "geoJsonUrl": "/data/sunshine-coast/geojson-stops.json",
+            "nodeListUrl": "/data/sunshine-coast/stops-list.json",
+            "initialPartialViewport": {
+                "latitude": -26.65,
+                "longitude": 153.02,
+                "zoom": 10
+            }
+        }
+    ],
+    "highlightColor": [
+        253,
+        128,
+        93
+    ],
+    "initialLoopTimeMinutes": 3,
+    "initialTrailLength": 200,
+    "initialViewport": {
+        "latitude": -27.44,
+        "longitude": 153.05,
+        "zoom": 11,
+        "maxZoom": 20,
+        "pitch": 45,
+        "bearing": 0,
+        "width": 500,
+        "height": 500
+    },
+    "mapboxStyle": "mapbox://styles/stevejk/ckewepbut0ofs19obaw54z2lg",
+    "nodeLabel": "Stop",
+    "nodeLabelPlural": "Stops",
+    "title": "Bus & Ferry Trips"
+}
