@@ -17,7 +17,7 @@ Sample data is a short timespan of South-East Queensland Bus & Ferry service loc
 -   Hover over nodes to get their Id
 
 ### Usage
-Clone this repo, set environment variable `REACT_APP_MAPBOX_TOKEN` with a [Mapbox](https://www.mapbox.com/) token, and optionally `REACT_APP_MAPBOX_STYLE` with a mapbox style. These variables can be set in the `.env.development` file. Then:
+Clone this repo, set environment variable `REACT_APP_MAPBOX_TOKEN` with a [Mapbox](https://www.mapbox.com/) token. This variable can be set in the `.env.development` file. Then:
 ```
 npm install
 npm start
@@ -25,4 +25,4 @@ npm start
 
 ### Data format
 Sample data is stored in the `public/data` folder. Not all bus/ferry vehicles or stops are shown.
-If you wish to use different data, the `default-app-config.ts` file contains default labels and URLs that can be updated.
+If you wish to use different data, colors or basemap, modify `public/app-settings.json`.

@@ -1,7 +1,6 @@
 import * as geojson from 'geojson';
 
-
-export interface AppConfig {
+export interface AppSettings {
     color: number[],
     colors: number[][],
     title: string,
@@ -11,7 +10,6 @@ export interface AppConfig {
     initialTrailLength: number,
     initialViewport: Viewport,
     mapboxStyle: string,
-    mapboxToken: string,
     nodeLabel: string,
     nodeLabelPlural: string
 };
@@ -37,6 +35,38 @@ export interface DataSampleUrls {
     geoJsonUrl: string,
     nodeListUrl: string,
     initialPartialViewport: PartialViewport
+}
+
+export interface InfoBoxProps {
+    appConfig: AppSettings,
+
+    dataSampleIdx: number,
+
+    handleDataChange: (pDataSampleIdx: number) => void,
+
+    friendlyName: string,
+
+    highlightedNodes: string[],
+    handleHighlightedNodes: (pHighlightedNodes: string[]) => void,
+
+    loopLength: number,
+
+    loopTimeMinutes: number,
+    handleLoopTimeMinutes: (pLoopTimeMinutes: number) => void,
+
+    nodeList: string[],
+
+    startDate: Date,
+
+    timestampOffset: number,
+    handleTimestampOffset: (pTimestampOffset: number) => void,
+
+    timeMultiplier: number,
+
+    trailLength: number,
+    handleTrailLength: (pTrailLength: number) => void,
+
+    reloadTrips: () => void;
 }
 
 export interface KnownUrlParameters {
