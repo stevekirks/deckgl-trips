@@ -18,6 +18,15 @@ jobs:
         run: |
           npm install
           npm run build
+          
+      - name: Test
+        run: npm run test
+
+      - uses: microsoft/variable-substitution@v1 
+        with:
+          files: 'build/app-settings.json'
+        env:
+          mapboxStyle: ${{ secrets.REACT_APP_MAPBOX_STYLE }}
 
       - uses: microsoft/variable-substitution@v1 
         with:
