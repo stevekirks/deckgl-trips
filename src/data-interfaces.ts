@@ -1,8 +1,6 @@
 import * as geojson from 'geojson';
-import React from 'react';
 
-
-export interface AppConfig {
+export interface AppSettings {
     color: number[],
     colors: number[][],
     title: string,
@@ -12,7 +10,6 @@ export interface AppConfig {
     initialTrailLength: number,
     initialViewport: Viewport,
     mapboxStyle: string,
-    mapboxToken: string,
     nodeLabel: string,
     nodeLabelPlural: string
 };
@@ -41,7 +38,7 @@ export interface DataSampleUrls {
 }
 
 export interface InfoBoxProps {
-    appConfig: AppConfig,
+    appConfig: AppSettings,
 
     dataSampleIdx: number,
 
@@ -50,24 +47,24 @@ export interface InfoBoxProps {
     friendlyName: string,
 
     highlightedNodes: string[],
-    setHighlightedNodes: React.Dispatch<React.SetStateAction<string[]>>,
+    handleHighlightedNodes: (pHighlightedNodes: string[]) => void,
 
     loopLength: number,
 
     loopTimeMinutes: number,
-    setLoopTimeMinutes: React.Dispatch<React.SetStateAction<number>>,
+    handleLoopTimeMinutes: (pLoopTimeMinutes: number) => void,
 
     nodeList: string[],
 
     startDate: Date,
 
     timestampOffset: number,
-    setTimestampOffset: React.Dispatch<React.SetStateAction<number>>,
+    handleTimestampOffset: (pTimestampOffset: number) => void,
 
     timeMultiplier: number,
 
     trailLength: number,
-    setTrailLength: React.Dispatch<React.SetStateAction<number>>
+    handleTrailLength: (pTrailLength: number) => void,
 
     reloadTrips: () => void;
 }
