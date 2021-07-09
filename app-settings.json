@@ -55,7 +55,7 @@
         128,
         93
     ],
-    "initialLoopTimeMinutes": 3,
+    "initialLoopTimeMinutes": 1,
     "initialTrailLength": 200,
     "initialViewport": {
         "latitude": -27.44,
