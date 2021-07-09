@@ -28,12 +28,6 @@ jobs:
         env:
           mapboxStyle: ${{ secrets.REACT_APP_MAPBOX_STYLE }}
 
-      - uses: microsoft/variable-substitution@v1 
-        with:
-          files: 'build/app-settings.json'
-        env:
-          mapboxStyle: ${{ secrets.REACT_APP_MAPBOX_STYLE }}
-
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
