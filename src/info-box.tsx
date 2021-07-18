@@ -162,7 +162,7 @@ const InfoBox = (props: InfoBoxProps) => {
           </div>
         </div>
         <div>
-          <h6>Highlight {props.appConfig.nodeLabelPlural}</h6>
+          <h6>Highlight Trips via {props.appConfig.nodeLabelPlural}</h6>
           <div>
             <Select
               closeMenuOnSelect={false}
@@ -170,7 +170,7 @@ const InfoBox = (props: InfoBoxProps) => {
               options={nodeListOptions}
               onChange={handleHighlightNodeChange}
               onMenuClose={props.reloadTrips}
-              placeholder={"Highlight " + props.appConfig.nodeLabelPlural}
+              placeholder={"Select " + props.appConfig.nodeLabelPlural}
               value={highlightedNodesVl}
             />
           </div>
