@@ -1,4 +1,4 @@
-import * as geojson from 'geojson';
+import { FeatureCollection, Point } from 'geojson';
 
 export interface AppSettings {
     color: number[],
@@ -22,7 +22,7 @@ export interface DeckglOverlayProps {
     initialViewState: Viewport,
     loopLength: number,
     loopTimeMinutes: number,
-    nodes: geojson.FeatureCollection<geojson.Point>,
+    nodes: FeatureCollection<Point>,
     timestampOffset: number,
     trips: Trip[] | null,
     trailLength: number,
