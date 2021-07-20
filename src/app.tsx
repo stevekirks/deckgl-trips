@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactMapGL, { Popup } from 'react-map-gl';
+import {FlyToInterpolator} from 'deck.gl';
 import DeckGLOverlay from './deckgl-overlay';
 import InfoBox from './info-box';
 import Loader from './loader';
@@ -34,16 +35,21 @@ const App = () => {
   const [timeMultiplier, setTimeMultiplier] = useState(1);
   const [trailLength, setTrailLength] = useState(knownUrlParams.trailLength || DEFAULT_APP_SETTINGS.initialTrailLength);
   const [trips, setTrips] = useState<Trip[] | null>(null);
-  const [viewport, setViewport] = useState({ ...DEFAULT_APP_SETTINGS.initialViewport });
+  const [viewport, setViewport] = useState({ 
+    ...DEFAULT_APP_SETTINGS.initialViewport, 
+    transitionDuration: 2000,
+    transitionInterpolator: new FlyToInterpolator() 
+  });
 
   const reloadTrips = () => {
     // create a new array for trips so the colours are updated
-    setTrips((prevTrips) => { return prevTrips ? [...prevTrips] : null; });
+    setTrips((prevTrips) => { return prevTrips ? [...prevTrips] : prevTrips; });
   }
 
   const handleHighlightedNodes = (pHighlightedNodes: string[]) => {
     setHighlightedNodes(pHighlightedNodes);
     setKnownUrlParams((prevKnownUrlParams) => { return { ...prevKnownUrlParams, highlightedNodes: pHighlightedNodes }; });
+    setNodes((prevNodes) => { return prevNodes ? {...prevNodes} : prevNodes; });
   }
 
   const handleLoopTimeMinutes = (pLoopTimeMinutes: number) => {
@@ -90,7 +96,6 @@ const App = () => {
 
     const handleWindowResize = () => setViewport((prevViewport) => { return { ...prevViewport, ...getWindowSize() }; });
     window.addEventListener('resize', handleWindowResize);
-    //setViewport((prevViewport) => { return { ...prevViewport, ...getWindowSize() }; })
 
     loadAppSettings();
     return () => window.removeEventListener("resize", handleWindowResize);
