@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl';
 import {DeckglOverlayProps, Trip, Waypoint} from './data-interfaces';
 import { RGBAColor, Position } from '@deck.gl/core';
+import { Feature, Point } from 'geojson';
 
 const DeckGLOverlay = (props: DeckglOverlayProps) => {
 
@@ -22,7 +23,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     return () => window.cancelAnimationFrame(animation.id);
   }, [animation, props.loopLength, props.timestampOffset, props.loopTimeMinutes]);
 
-  const getColor = (d: Trip) => {
+  const getTripColor = (d: Trip) => {
     let color = props.color;
     const tagColor = d.color;
     if (tagColor != null) {
@@ -42,6 +43,29 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     return color as RGBAColor;
   }
 
+  const getNodeColor = (d: unknown) => {
+    let node = d as Feature<Point>;
+    let color = [0, 255, 178, 150];
+
+    if (props.highlightedNodes.length > 0
+      && node.properties?.name
+      && props.highlightedNodes.find((hn: string) => node.properties?.name.toLowerCase() === hn.toLowerCase()) != null) {
+        color = [255, 109, 245, 150];
+    }
+
+    return color as RGBAColor;
+  }
+
+  const getNodeRadius = (d: unknown) => {
+    let node = d as Feature<Point>;
+    if (props.highlightedNodes.length > 0
+      && node.properties?.name
+      && props.highlightedNodes.find((hn: string) => node.properties?.name.toLowerCase() === hn.toLowerCase()) != null) {
+        return 2;
+    }
+    return 0.4;
+  };
+
   let layers = [];
   
   if (props.trips != null) {
@@ -50,7 +74,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       data: props.trips,
       getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates as Position),
       getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
-      getColor: getColor,
+      getColor: getTripColor,
       opacity: 0.3,
       widthMinPixels: 2,
       trailLength: props.trailLength,
@@ -63,16 +87,28 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       id: 'geojson-layer',
       data: props.nodes,
       filled: true,
-      getFillColor: () => [0, 255, 178, 150],
+      getFillColor: getNodeColor,
       stroked: true,
       extruded: false,
       pointRadiusScale: 100,
-      getRadius: () => 0.4,
+      getRadius: getNodeRadius,
       pickable: true,
       autoHighlight: true,
       highlightColor: [0, 255, 178, 250],
       onHover: props.handleOnHover,
-      onClick: (info: any) => console.log(info.object.properties.name)
+      onClick: (info: any) => console.log(info.object.properties.name),
+      transitions: {
+        getFillColor: {
+          type: 'interpolation',
+          duration: 700,
+          easing: (t) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
+        },
+        getRadius: {
+          type: 'spring',
+          stiffness: 0.2,
+          damping: 0.3
+        }
+      }
     }));
   }
 
