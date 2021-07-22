@@ -61,7 +61,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     if (props.highlightedNodes.length > 0
       && node.properties?.name
       && props.highlightedNodes.find((hn: string) => node.properties?.name.toLowerCase() === hn.toLowerCase()) != null) {
-        return 2;
+        return 0.8;
     }
     return 0.4;
   };
@@ -72,13 +72,20 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     layers.push(new TripsLayer({
       id: 'trips',
       data: props.trips,
+      currentTime,
+      getColor: getTripColor,
       getPath: (d: Trip) => d.segments.map((p: Waypoint) => p.coordinates as Position),
       getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
-      getColor: getTripColor,
       opacity: 0.3,
-      widthMinPixels: 2,
       trailLength: props.trailLength,
-      currentTime
+      widthMinPixels: 2,
+      transitions: {
+        getColor: {
+          type: 'interpolation',
+          duration: 700,
+          easing: (t) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
+        }
+      }
     }));
   }
 
@@ -86,15 +93,15 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     layers.push(new GeoJsonLayer({
       id: 'geojson-layer',
       data: props.nodes,
+      autoHighlight: true,
+      extruded: false,
       filled: true,
       getFillColor: getNodeColor,
-      stroked: true,
-      extruded: false,
-      pointRadiusScale: 100,
       getRadius: getNodeRadius,
-      pickable: true,
-      autoHighlight: true,
       highlightColor: [0, 255, 178, 250],
+      pickable: true,
+      pointRadiusScale: 100,
+      stroked: true,
       onHover: props.handleOnHover,
       onClick: (info: any) => console.log(info.object.properties.name),
       transitions: {
