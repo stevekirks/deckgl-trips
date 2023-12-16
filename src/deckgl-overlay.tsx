@@ -97,7 +97,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       extruded: false,
       filled: true,
       getFillColor: getNodeColor,
-      getRadius: getNodeRadius,
+      getPointRadius: getNodeRadius,
       highlightColor: [0, 255, 178, 250],
       pickable: true,
       pointRadiusScale: 100,

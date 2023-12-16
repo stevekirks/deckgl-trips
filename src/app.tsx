@@ -218,8 +218,8 @@ const App = () => {
           {...viewport}
           mapStyle={appSettings.mapboxStyle}
           dragRotate={true}
-          onViewportChange={handleViewportChange}
-          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN!}>
+          // onMove={handleViewportChange}
+          mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN!}>
           <DeckGLOverlay
             color={appSettings.color}
             handleOnHover={handleOnHoverGeoPoint}
