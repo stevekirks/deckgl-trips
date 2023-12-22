@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import ReactMapGL, { Popup } from 'react-map-gl';
+import ReactMapGL, { Popup, ViewStateChangeEvent } from 'react-map-gl';
 import {FlyToInterpolator} from 'deck.gl';
 import DeckGLOverlay from './deckgl-overlay';
 import InfoBox from './info-box';
@@ -68,7 +68,7 @@ const App = () => {
     setKnownUrlParams((prevKnownUrlParams) => { return { ...prevKnownUrlParams, trailLength: pTrailLength }; });
   }
 
-  const handleViewportChange = (pViewport: any) => {
+  const handleViewportChange = (pViewport: ViewStateChangeEvent) => {
     setViewport((prevViewport) => { return { ...prevViewport, ...pViewport, ...getWindowSize() }; });
   }
 
@@ -219,7 +219,8 @@ const App = () => {
           mapStyle={appSettings.mapboxStyle}
           dragRotate={true}
           // onMove={handleViewportChange}
-          mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN!}>
+          mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN!}
+          style={{width: 800, height: 600}}>
           <DeckGLOverlay
             color={appSettings.color}
             handleOnHover={handleOnHoverGeoPoint}
