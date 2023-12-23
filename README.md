@@ -6,7 +6,7 @@
 
 <h1 align="center">deck.gl trips | <a href="https://stevekirks.github.io/deckgl-trips">example</a></h1>
 
-This is an example of the deck.gl trips layer. Written in Typescript using [deck.gl](https://deck.gl).
+This is an example of the deck.gl trips layer. Written using [deck.gl](https://deck.gl) with React and Typescript.
 
 Sample data is a short timespan of South-East Queensland Bus & Ferry service locations from the [Translink data feed](https://data.qld.gov.au/dataset/translink-real-time-data), [transformed](https://github.com/stevekirks/gtfs-protobuf-to-trips-rs) to suit.
 
@@ -20,7 +20,7 @@ Sample data is a short timespan of South-East Queensland Bus & Ferry service loc
 Clone this repo, set environment variable `VITE_MAPBOX_TOKEN` with a [Mapbox](https://www.mapbox.com/) token. This variable can be set in the `.env` file. Then:
 ```
 npm install
-npm run dev
+npm run start
 ```
 
 ### Data format
