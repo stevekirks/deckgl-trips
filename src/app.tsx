@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactMapGL, { Popup, ViewStateChangeEvent } from 'react-map-gl';
-import {FlyToInterpolator} from 'deck.gl';
+import {FlyToInterpolator} from 'deck.gl/typed';
 import DeckGLOverlay from './deckgl-overlay';
 import InfoBox from './info-box';
 import Loader from './loader';
@@ -220,7 +220,7 @@ const App = () => {
           dragRotate={true}
           // onMove={handleViewportChange}
           mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN!}
-          style={{width: 800, height: 600}}>
+          style={{height: 800}}>
           <DeckGLOverlay
             color={appSettings.color}
             handleOnHover={handleOnHoverGeoPoint}
