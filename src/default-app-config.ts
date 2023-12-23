@@ -10,16 +10,20 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     highlightColor: [255, 109, 245], // pink
     initialLoopTimeMinutes: 1,
     initialTrailLength: 100,
-    initialViewport: {
+    initialViewState: {
         latitude: 19.045632,
         longitude: 68.538902,
         zoom: 3,
-        maxZoom: 20,
         pitch: 45,
         bearing: 0,
-        width: 500,
-        height: 500
+        padding: {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        }
     },
+    maxZoom: 20,
     mapboxStyle: "mapbox://styles/mapbox/dark-v10",
     nodeLabel: "Node",
     nodeLabelPlural: 'Nodes',

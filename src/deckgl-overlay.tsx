@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
-import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl/typed';
+import {DeckProps, GeoJsonLayer, TripsLayer} from 'deck.gl/typed';
 import {DeckglOverlayProps, Trip, Waypoint} from './data-interfaces';
 import { Color, Position } from '@deck.gl/core/typed';
+import {MapboxOverlay} from '@deck.gl/mapbox/typed';
 import { Feature, Point } from 'geojson';
+import { useControl } from 'react-map-gl';
+
+function DeckGLMapboxOverlay(props: DeckProps) {
+  const deck = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
+
+  deck.setProps(props);
+  return null;
+}
 
 const DeckGLOverlay = (props: DeckglOverlayProps) => {
 
@@ -124,9 +133,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
   }
 
   return (
-    <DeckGL
-      initialViewState={props.initialViewState}
-      viewState={props.viewport}
+    <DeckGLMapboxOverlay
       layers={layers}
     />
   );
