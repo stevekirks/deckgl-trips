@@ -1,4 +1,5 @@
 import { FeatureCollection, Point } from 'geojson';
+import { ViewState } from 'react-map-gl';
 
 export interface AppSettings {
     color: number[],
@@ -8,7 +9,8 @@ export interface AppSettings {
     highlightColor: number[],
     initialLoopTimeMinutes: number,
     initialTrailLength: number,
-    initialViewport: Viewport,
+    initialViewState: ViewState,
+    maxZoom: number,
     mapboxStyle: string,
     nodeLabel: string,
     nodeLabelPlural: string
@@ -19,14 +21,12 @@ export interface DeckglOverlayProps {
     handleOnHover: (info: any) => void,
     highlightColor: number[],
     highlightedNodes: string[],
-    initialViewState: Viewport,
     loopLength: number,
     loopTimeMinutes: number,
     nodes: FeatureCollection<Point>,
     timestampOffset: number,
     trips: Trip[] | null,
-    trailLength: number,
-    viewport: any
+    trailLength: number
 }
 
 export interface DataSampleUrls {
@@ -96,17 +96,6 @@ export interface Trip {
     endTime: number,
     color?: number[],
     segments: Waypoint[]
-}
-
-export interface Viewport {
-    latitude: number,
-    longitude: number,
-    zoom: number
-    maxZoom: number,
-    pitch: number,
-    bearing: number,
-    width?: number,
-    height?: number
 }
 
 export interface Waypoint {
