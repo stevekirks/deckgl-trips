@@ -34,7 +34,7 @@ export interface DataSampleUrls {
     tripsUrl: string,
     geoJsonUrl: string,
     nodeListUrl: string,
-    initialPartialViewport: PartialViewport
+    initialPartialViewState: PartialViewState
 }
 
 export interface InfoBoxProps {
@@ -76,7 +76,7 @@ export interface KnownUrlParameters {
     highlightedNodes: string[] | null
 };
 
-export interface PartialViewport {
+export interface PartialViewState {
     latitude: number,
     longitude: number,
     zoom: number
