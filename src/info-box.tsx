@@ -3,7 +3,7 @@ import { DataSampleUrls, InfoBoxProps} from './data-interfaces';
 import Select from 'react-select';
 import './info-box.css';
 import './select.css';
-import { ValueType } from 'react-select/src/types';
+import { SingleValue } from 'react-select'
 
 const InfoBox = (props: InfoBoxProps) => {
 
@@ -106,7 +106,7 @@ const InfoBox = (props: InfoBoxProps) => {
     }
   }
 
-  const handleHighlightNodeChange = (highlightedNodesCommaSep: ValueType<any, any>) => {
+  const handleHighlightNodeChange = (highlightedNodesCommaSep: SingleValue<any>) => {
     if (highlightedNodesCommaSep == null) {
       highlightedNodesCommaSep = [];
     }
@@ -118,7 +118,7 @@ const InfoBox = (props: InfoBoxProps) => {
     }
   }
 
-  const handleDataSelectChange = (dataSampleOption: ValueType<any, any>) => {    
+  const handleDataSelectChange = (dataSampleOption: SingleValue<any>) => {    
     if (dataSampleOption != null) {
       handleHighlightNodeChange([]);
       handleDataChange(dataSampleOption.value as number);

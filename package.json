@@ -1,56 +1,37 @@
 {
   "name": "deckgl-trips",
   "homepage": ".",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "dependencies": {
-    "@danmarshall/deckgl-typings": "^4.9.2",
-    "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "@types/geojson": "^7946.0.7",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^12.20.15",
-    "@types/react": "^17.0.13",
-    "@types/react-dom": "^17.0.8",
-    "@types/react-select": "^4.0.16",
-    "deck.gl": "^8.4.20",
-    "geojson": "^0.5.0",
-    "mapbox-gl": "^2.3.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-map-gl": "^6.1.16",
-    "react-scripts": "4.0.3",
-    "react-select": "^4.3.1",
-    "typescript": "^4.3.5",
-    "web-vitals": "^1.1.2",
-    "worker-loader": "^3.0.8"
-  },
+  "type": "module",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "dependencies": {
+    "@types/geojson": "^7946.0.13",
+    "@types/mapbox-gl": "^2.7.19",
+    "deck.gl": "^8.9.33",
+    "geojson": "^0.5.0",
+    "mapbox-gl": "^3.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-map-gl": "^7.1.7",
+    "react-select": "^5.8.0"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not ie 11",
-      "not chrome < 51",
-      "not safari < 10",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
   }
 }
