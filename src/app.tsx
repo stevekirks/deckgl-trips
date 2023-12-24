@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
-import ReactMapGL, { Popup } from 'react-map-gl';
-import {FlyToInterpolator} from 'deck.gl';
+import { useRef, useState, useEffect } from 'react';
+import Map, { Popup, MapRef, NavigationControl } from 'react-map-gl';
 import DeckGLOverlay from './deckgl-overlay';
 import InfoBox from './info-box';
 import Loader from './loader';
@@ -10,13 +9,6 @@ import * as geojson from 'geojson';
 import './app.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { DEFAULT_APP_SETTINGS } from './default-app-config';
-
-const getWindowSize = () => {
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight
-  };
-}
 
 const App = () => {
 
@@ -35,11 +27,9 @@ const App = () => {
   const [timeMultiplier, setTimeMultiplier] = useState(1);
   const [trailLength, setTrailLength] = useState(knownUrlParams.trailLength || DEFAULT_APP_SETTINGS.initialTrailLength);
   const [trips, setTrips] = useState<Trip[] | null>(null);
-  const [viewport, setViewport] = useState({ 
-    ...DEFAULT_APP_SETTINGS.initialViewport, 
-    transitionDuration: 2000,
-    transitionInterpolator: new FlyToInterpolator() 
-  });
+  const [mapHeight, setMapHeight] = useState(window.innerHeight);
+
+  const mapRef = useRef<MapRef>(null);
 
   const reloadTrips = () => {
     // create a new array for trips so the colours are updated
@@ -68,10 +58,6 @@ const App = () => {
     setKnownUrlParams((prevKnownUrlParams) => { return { ...prevKnownUrlParams, trailLength: pTrailLength }; });
   }
 
-  const handleViewportChange = (pViewport: any) => {
-    setViewport((prevViewport) => { return { ...prevViewport, ...pViewport, ...getWindowSize() }; });
-  }
-
   const handleDataChange = (pDataSampleIdx: number) => {
     setDataSampleIdx(pDataSampleIdx);
   }
@@ -94,7 +80,7 @@ const App = () => {
       });
     };
 
-    const handleWindowResize = () => setViewport((prevViewport) => { return { ...prevViewport, ...getWindowSize() }; });
+    const handleWindowResize = () => setMapHeight(window.innerHeight);
     window.addEventListener('resize', handleWindowResize);
 
     loadAppSettings();
@@ -187,7 +173,14 @@ const App = () => {
         loadTrips(dataSampleIdx);
         loadNodeList(dataSampleIdx);
         loadGeoJsonNodes(dataSampleIdx);
-        setViewport((prevViewport) => { return { ...prevViewport, ...appSettings.initialViewport, ...appSettings.dataSamples[dataSampleIdx].initialPartialViewport, ...getWindowSize() }; });
+        mapRef.current?.flyTo({
+          center: [
+            appSettings.dataSamples[dataSampleIdx].initialPartialViewport.longitude, 
+            appSettings.dataSamples[dataSampleIdx].initialPartialViewport.latitude
+          ], 
+          duration: 2000,
+          zoom: appSettings.dataSamples[dataSampleIdx].initialPartialViewport.zoom
+        });
       }
     }
   }, [dataSampleIdx, appSettings]);
@@ -214,28 +207,30 @@ const App = () => {
     <div id="container">
       {loader}
       <div id="divdeckgl">
-        <ReactMapGL
-          {...viewport}
+        <Map
+          maxZoom={appSettings.maxZoom}
+          initialViewState={appSettings.initialViewState}
+          ref={mapRef}
           mapStyle={appSettings.mapboxStyle}
           dragRotate={true}
-          onViewportChange={handleViewportChange}
-          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN!}>
+          mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN!}
+          style={{height: mapHeight}}
+          >
           <DeckGLOverlay
             color={appSettings.color}
             handleOnHover={handleOnHoverGeoPoint}
             highlightColor={appSettings.highlightColor}
             highlightedNodes={highlightedNodes}
-            initialViewState={appSettings.initialViewport}
             loopLength={loopLength}
             loopTimeMinutes={loopTimeMinutes}
             nodes={nodes!}
             timestampOffset={timestampOffset}
             trips={trips}
             trailLength={trailLength}
-            viewport={viewport}
           />
           {popupEle}
-        </ReactMapGL>
+          <NavigationControl />
+        </Map>
       </div>
       <InfoBox
         appConfig={appSettings}

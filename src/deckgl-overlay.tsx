@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
-import DeckGL, {GeoJsonLayer, TripsLayer} from 'deck.gl';
+import {DeckProps, GeoJsonLayer, TripsLayer} from 'deck.gl/typed';
 import {DeckglOverlayProps, Trip, Waypoint} from './data-interfaces';
-import { RGBAColor, Position } from '@deck.gl/core';
+import { Color, Position } from '@deck.gl/core/typed';
+import {MapboxOverlay} from '@deck.gl/mapbox/typed';
 import { Feature, Point } from 'geojson';
+import { useControl } from 'react-map-gl';
+
+function DeckGLMapboxOverlay(props: DeckProps) {
+  const deck = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
+
+  deck.setProps(props);
+  return null;
+}
 
 const DeckGLOverlay = (props: DeckglOverlayProps) => {
 
@@ -40,7 +49,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       }
     }
 
-    return color as RGBAColor;
+    return color as Color;
   }
 
   const getNodeColor = (d: unknown) => {
@@ -53,7 +62,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
         color = [255, 109, 245, 150];
     }
 
-    return color as RGBAColor;
+    return color as Color;
   }
 
   const getNodeRadius = (d: unknown) => {
@@ -83,7 +92,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
         getColor: {
           type: 'interpolation',
           duration: 700,
-          easing: (t) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
+          easing: (t: any) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
         }
       }
     }));
@@ -97,7 +106,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       extruded: false,
       filled: true,
       getFillColor: getNodeColor,
-      getRadius: getNodeRadius,
+      getPointRadius: getNodeRadius,
       highlightColor: [0, 255, 178, 250],
       pickable: true,
       pointRadiusScale: 100,
@@ -108,7 +117,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
         getFillColor: {
           type: 'interpolation',
           duration: 700,
-          easing: (t) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
+          easing: (t: any) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
         },
         getRadius: {
           type: 'spring',
@@ -124,9 +133,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
   }
 
   return (
-    <DeckGL
-      initialViewState={props.initialViewState}
-      viewState={props.viewport}
+    <DeckGLMapboxOverlay
       layers={layers}
     />
   );
