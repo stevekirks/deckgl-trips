@@ -12,7 +12,7 @@
             "tripsUrl": "data/brisbane/trips.json",
             "geoJsonUrl": "data/brisbane/geojson-stops.json",
             "nodeListUrl": "data/brisbane/stops-list.json",
-            "initialPartialViewport": {
+            "initialPartialViewState": {
                 "latitude": -27.47,
                 "longitude": 153.05,
                 "zoom": 11
@@ -23,7 +23,7 @@
             "tripsUrl": "data/cairns/trips.json",
             "geoJsonUrl": "data/cairns/geojson-stops.json",
             "nodeListUrl": "data/cairns/stops-list.json",
-            "initialPartialViewport": {
+            "initialPartialViewState": {
                 "latitude": -16.940,
                 "longitude": 145.750,
                 "zoom": 12
@@ -34,7 +34,7 @@
             "tripsUrl": "data/gold-coast/trips.json",
             "geoJsonUrl": "data/gold-coast/geojson-stops.json",
             "nodeListUrl": "data/gold-coast/stops-list.json",
-            "initialPartialViewport": {
+            "initialPartialViewState": {
                 "latitude": -27.999,
                 "longitude": 153.410,
                 "zoom": 11
@@ -45,7 +45,7 @@
             "tripsUrl": "data/sunshine-coast/trips.json",
             "geoJsonUrl": "data/sunshine-coast/geojson-stops.json",
             "nodeListUrl": "data/sunshine-coast/stops-list.json",
-            "initialPartialViewport": {
+            "initialPartialViewState": {
                 "latitude": -26.67,
                 "longitude": 153.06,
                 "zoom": 11
@@ -55,15 +55,18 @@
     "highlightColor": [253, 128, 93],
     "initialLoopTimeMinutes": 1,
     "initialTrailLength": 200,
-    "initialViewport": {
+    "initialViewState": {
         "latitude": -27.44,
         "longitude": 153.05,
         "zoom": 11,
-        "maxZoom": 20,
         "pitch": 45,
         "bearing": 0,
-        "width": 500,
-        "height": 500
+        "padding": {
+            "top": 0,
+            "bottom": 0,
+            "left": 0,
+            "right": 0
+        }
     },
     "mapboxStyle": "mapbox://styles/mapbox/dark-v10",
     "nodeLabel": "Stop",
