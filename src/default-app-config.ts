@@ -11,9 +11,9 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     initialLoopTimeMinutes: 1,
     initialTrailLength: 100,
     initialViewState: {
-        latitude: 19.045632,
-        longitude: 68.538902,
-        zoom: 3,
+        latitude: -27.44,
+        longitude: 153.05,
+        zoom: 11,
         pitch: 45,
         bearing: 0,
         padding: {
