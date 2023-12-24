@@ -182,15 +182,6 @@ const App = () => {
           zoom: appSettings.dataSamples[dataSampleIdx].initialPartialViewState.zoom
         });
       }
-    } else {
-      mapRef.current?.flyTo({
-        center: [
-          appSettings.initialViewState.longitude, 
-          appSettings.initialViewState.latitude
-        ], 
-        duration: 2000,
-        zoom: appSettings.initialViewState.zoom
-      });
     }
   }, [dataSampleIdx, appSettings]);
 
