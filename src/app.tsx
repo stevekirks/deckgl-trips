@@ -175,11 +175,11 @@ const App = () => {
         loadGeoJsonNodes(dataSampleIdx);
         mapRef.current?.flyTo({
           center: [
-            appSettings.dataSamples[dataSampleIdx].initialPartialViewport.longitude, 
-            appSettings.dataSamples[dataSampleIdx].initialPartialViewport.latitude
+            appSettings.dataSamples[dataSampleIdx].initialPartialViewState.longitude, 
+            appSettings.dataSamples[dataSampleIdx].initialPartialViewState.latitude
           ], 
           duration: 2000,
-          zoom: appSettings.dataSamples[dataSampleIdx].initialPartialViewport.zoom
+          zoom: appSettings.dataSamples[dataSampleIdx].initialPartialViewState.zoom
         });
       }
     }
