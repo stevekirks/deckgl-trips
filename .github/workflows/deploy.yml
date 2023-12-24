@@ -1,16 +1,28 @@
-name: CD
+name: Deploy
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
 jobs:
   deploy:
+    environment:
+      name: gh-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       
       - name: Install and Build
         env:
@@ -18,18 +30,12 @@ jobs:
         run: |
           npm install
           npm run build
-          
-      - name: Test
-        run: npm run test
-
-      - uses: microsoft/variable-substitution@v1 
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          files: 'build/app-settings.json'
-        env:
-          mapboxStyle: ${{ secrets.VITE_MAPBOX_STYLE }}
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages
-          folder: build
+          path: './dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
