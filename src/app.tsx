@@ -47,6 +47,20 @@ const App = () => {
     setKnownUrlParams((prevKnownUrlParams) => { return { ...prevKnownUrlParams, loopTime: pLoopTimeMinutes }; });
   }
 
+  const handleOnClickGeoPoint = (info: any) => {
+    console.log(info.object.properties.name)
+    const node = info.object.properties.name;
+    const highlightedNodeIdx = highlightedNodes.indexOf(node);
+    const pHighlightedNodes = highlightedNodes.slice(0);
+    if (highlightedNodeIdx == -1) {
+      pHighlightedNodes.push(node);
+    } else {
+      pHighlightedNodes.splice(highlightedNodeIdx, 1);
+    }
+    handleHighlightedNodes(pHighlightedNodes);
+    reloadTrips();
+  }
+
   const handleOnHoverGeoPoint = (info: any) => {
     setPopupInfo(info !== null ? info.object : null);
   }
@@ -218,7 +232,8 @@ const App = () => {
           >
           <DeckGLOverlay
             color={appSettings.color}
-            handleOnHover={handleOnHoverGeoPoint}
+            handleOnClickGeoPoint={handleOnClickGeoPoint}
+            handleOnHoverGeoPoint={handleOnHoverGeoPoint}
             highlightColor={appSettings.highlightColor}
             highlightedNodes={highlightedNodes}
             loopLength={loopLength}
