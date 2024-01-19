@@ -111,11 +111,8 @@ const InfoBox = (props: InfoBoxProps) => {
       highlightedNodesCommaSep = [];
     }
     let pHighlightedNodes: string[] = highlightedNodesCommaSep.map((n: any) => n.value);
-    let highlightedNodesRemoved = props.highlightedNodes.length > pHighlightedNodes.length;
     handleHighlightedNodes(pHighlightedNodes);
-    if (highlightedNodesRemoved) {
-      reloadTrips();
-    }
+    reloadTrips();
   }
 
   const handleDataSelectChange = (dataSampleOption: SingleValue<any>) => {    
@@ -169,7 +166,6 @@ const InfoBox = (props: InfoBoxProps) => {
               isMulti
               options={nodeListOptions}
               onChange={handleHighlightNodeChange}
-              onMenuClose={props.reloadTrips}
               placeholder={"Select " + props.appConfig.nodeLabelPlural}
               value={highlightedNodesVl}
             />

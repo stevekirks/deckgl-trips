@@ -87,7 +87,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
       opacity: 0.3,
       trailLength: props.trailLength,
-      widthMinPixels: 2,
+      widthMinPixels: 3,
       transitions: {
         getColor: {
           type: 'interpolation',
@@ -111,8 +111,8 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       pickable: true,
       pointRadiusScale: 100,
       stroked: true,
-      onHover: props.handleOnHover,
-      onClick: (info: any) => console.log(info.object.properties.name),
+      onHover: props.handleOnHoverGeoPoint,
+      onClick: props.handleOnClickGeoPoint,
       transitions: {
         getFillColor: {
           type: 'interpolation',
