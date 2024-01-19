@@ -111,8 +111,8 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       pickable: true,
       pointRadiusScale: 100,
       stroked: true,
-      onHover: props.handleOnHover,
-      onClick: (info: any) => console.log(info.object.properties.name),
+      onHover: props.handleOnHoverGeoPoint,
+      onClick: props.handleOnClickGeoPoint,
       transitions: {
         getFillColor: {
           type: 'interpolation',

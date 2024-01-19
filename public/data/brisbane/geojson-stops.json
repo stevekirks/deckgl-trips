@@ -44,7 +44,6 @@
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.31767,-27.581139]},"properties":{"stopId":"311156","name":"311156"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.17374,-27.660583]},"properties":{"stopId":"320683","name":"320683"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.0602,-27.408081]},"properties":{"stopId":"11139","name":"11139"}},{
- "type": "Feature","geometry":{"type":"Point","coordinates":[153.01888,-27.465237]},"properties":{"stopId":"600030","name":"600030"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.08186,-27.225166]},"properties":{"stopId":"319796","name":"319796"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.08156,-27.225477]},"properties":{"stopId":"600633","name":"600633"}}]
  }

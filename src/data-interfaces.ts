@@ -18,7 +18,8 @@ export interface AppSettings {
 
 export interface DeckglOverlayProps {
     color: number[],
-    handleOnHover: (info: any) => void,
+    handleOnClickGeoPoint: (info: any) => void,
+    handleOnHoverGeoPoint: (info: any) => void,
     highlightColor: number[],
     highlightedNodes: string[],
     loopLength: number,
