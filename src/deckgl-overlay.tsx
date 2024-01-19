@@ -87,7 +87,7 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       getTimestamps: (d: Trip) => d.segments.map((p: Waypoint) => p.timestamp),
       opacity: 0.3,
       trailLength: props.trailLength,
-      widthMinPixels: 2,
+      widthMinPixels: 3,
       transitions: {
         getColor: {
           type: 'interpolation',
