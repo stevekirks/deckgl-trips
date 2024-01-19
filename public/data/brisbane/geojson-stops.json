@@ -28,7 +28,6 @@
  "type": "Feature","geometry":{"type":"Point","coordinates":[152.99126,-27.444027]},"properties":{"stopId":"1960","name":"1960"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[152.9699,-27.62372]},"properties":{"stopId":"10969","name":"10969"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.09642,-27.470943]},"properties":{"stopId":"5931","name":"5931"}},{
- "type": "Feature","geometry":{"type":"Point","coordinates":[153.01909,-27.467804]},"properties":{"stopId":"1","name":"1"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[152.9527,-27.11]},"properties":{"stopId":"310086","name":"310086"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.03603,-27.457472]},"properties":{"stopId":"206","name":"206"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.01772,-27.497889]},"properties":{"stopId":"1880","name":"1880"}},{
@@ -37,18 +36,14 @@
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.19221,-27.52361]},"properties":{"stopId":"320675","name":"320675"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.06335,-27.443916]},"properties":{"stopId":"2822","name":"2822"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[152.97827,-27.409721]},"properties":{"stopId":"2193","name":"2193"}},{
- "type": "Feature","geometry":{"type":"Point","coordinates":[153.01753,-27.47161]},"properties":{"stopId":"10709","name":"10709"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[152.98903,-27.636639]},"properties":{"stopId":"11259","name":"11259"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.10323,-27.503195]},"properties":{"stopId":"6298","name":"6298"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.02045,-27.496777]},"properties":{"stopId":"319665","name":"319665"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.02188,-27.4725]},"properties":{"stopId":"317593","name":"317593"}},{
- "type": "Feature","geometry":{"type":"Point","coordinates":[152.99374,-27.307388]},"properties":{"stopId":"10298","name":"10298"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[152.94066,-27.50736]},"properties":{"stopId":"4585","name":"4585"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.31767,-27.581139]},"properties":{"stopId":"311156","name":"311156"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.17374,-27.660583]},"properties":{"stopId":"320683","name":"320683"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.0602,-27.408081]},"properties":{"stopId":"11139","name":"11139"}},{
- "type": "Feature","geometry":{"type":"Point","coordinates":[153.01888,-27.465237]},"properties":{"stopId":"600030","name":"600030"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.08186,-27.225166]},"properties":{"stopId":"319796","name":"319796"}},{
- "type": "Feature","geometry":{"type":"Point","coordinates":[153.0165,-27.473082]},"properties":{"stopId":"1090","name":"1090"}},{
  "type": "Feature","geometry":{"type":"Point","coordinates":[153.08156,-27.225477]},"properties":{"stopId":"600633","name":"600633"}}]
  }
