@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {DeckProps, GeoJsonLayer, TripsLayer} from 'deck.gl/typed';
+import {DeckProps, GeoJsonLayer, PickingInfo, TripsLayer} from 'deck.gl/typed';
 import {DeckglOverlayProps, Trip, Waypoint} from './data-interfaces';
 import { Color, Position } from '@deck.gl/core/typed';
 import {MapboxOverlay} from '@deck.gl/mapbox/typed';
@@ -65,6 +65,19 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
     return color as Color;
   }
 
+  const getHoverNodeColor = (d: PickingInfo) => {
+    let node = d.object;
+    let color = [0, 255, 178, 250];
+
+    if (props.highlightedNodes.length > 0
+      && node?.properties?.name
+      && props.highlightedNodes.find((hn: string) => node.properties?.name.toLowerCase() === hn.toLowerCase()) != null) {
+        color = [255, 109, 245, 250];
+    }
+
+    return color;
+  }
+
   const getNodeRadius = (d: unknown) => {
     let node = d as Feature<Point>;
     if (props.highlightedNodes.length > 0
@@ -107,22 +120,29 @@ const DeckGLOverlay = (props: DeckglOverlayProps) => {
       filled: true,
       getFillColor: getNodeColor,
       getPointRadius: getNodeRadius,
-      highlightColor: [0, 255, 178, 250],
+      highlightColor: getHoverNodeColor, // for hover
       pickable: true,
       pointRadiusScale: 100,
-      stroked: true,
+      stroked: false,
       onHover: props.handleOnHoverGeoPoint,
       onClick: props.handleOnClickGeoPoint,
       transitions: {
         getFillColor: {
           type: 'interpolation',
-          duration: 700,
-          easing: (t: any) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2,
+          duration: 1000,
+          easing: (t: any) => ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2
         },
-        getRadius: {
-          type: 'spring',
-          stiffness: 0.2,
-          damping: 0.3
+        getPointRadius: {
+          type: 'interpolation',
+          duration: 1000,
+          easing: (x: number) => { // https://easings.net/#easeInOutBack
+            const c1 = 1.70158;
+            const c2 = c1 * 1.525;
+            
+            return x < 0.5
+              ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+              : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+          }
         }
       }
     }));
